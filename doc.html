@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8">
+      <meta name="description" content="Highly-collaborative distributed systems: synthesis and enactment at work">
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <title>Automated Synthesis of Context-Aware Choreographies documentation page for replication package</title>
+      <link rel="stylesheet" href="css/scribbler-global.css">
+      <link rel="stylesheet" href="css/scribbler-doc.css">
+
+      <style>
+         .mySlides {display:none;}
+
+         :root{
+            --primary-color: #404040;
+         }
+      </style>
+   </head>
+   <body>
+      <div class="doc__bg"></div>
+      <nav class="header">
+         <h1 class="logo">Automated Synthesis of Context-Aware Choreographies<span class="logo__thin">Doc</span></h1>
+         <ul class="menu">
+            <div class="menu__item toggle"><span></span></div>
+            <li class="menu__item"><a href="https://github.com/sosygroup/synthesis-context-aware-choreographies" class="link link--dark"><i class="fab fa-github"></i> Github</a></li>
+            <li class="menu__item"><a href="index.html" class="link link--dark"><i class="fas fa-home"></i> Home</a></li>
+         </ul>
+      </nav>
+      <div class="wrapper">
+         <aside class="doc__nav">
+            <ul class="fixed">
+               <li class="selected"><a href ="#get_started">Get Started</a></li>
+               <li><a href ="#deployment_enactment">Deployment and Enactment</a></li>
+               <li><a href ="#execution_monitoring">Execution and Monitoring</a></li>
+            </ul>
+         </aside>
+         <article class="doc__content">
+            <section id="get_started" >
+               <h3 class="section__title">Get Started</h3>
+               <p>Learn how to use the replication package.</p>
+               <h4 class="section__title">Requirements</h4>
+               <p>Java 8 or later and Maven 3.</p>
+               <h4 class="section__title">Installation</h4>
+               <p>Clone the replication package from <a target="_blank" href="https://github.com/sosygroup/synthesis-context-aware-choreographies" class="link link--light">Github</a> and build provider and prosumer services.</p>
+               <div class="code__block code__block--notabs">
+                  <pre class="code code--block">
+                     <code>
+                       git clone https://github.com/sosygroup/synthesis-context-aware-choreographies.git synthesis-context-aware-choreographies
+                       cd synthesis-context-aware-choreographies
+                       cd providers
+                       mvn clean install
+                       cd ../prosumers
+                       mvn clean install
+                     </code>
+                  </pre>
+               </div>
+               <hr />
+            </section>
+
+            <section id="deployment_enactment">
+               <h3 class="section__title">Deployment and Enactment</h3>
+ 
+               <h4>Setup your target nodes</h4>
+
+               <p>Deploy the war files of the provider and prosumer services on one or more servlet containers (e.g., Apache Tomcat). Be sure that each servlet container is accessibile from the network.</p>
+
+               <hr />
+            </section>
+            <section id="execution_monitoring">
+               <h3 class="section__title">Execution and Monitoring</h3>
+
+            </section>
+         </article>
+      </div>
+      <script src="js/jquery-3.3.1.min.js"></script>
+      <script src="js/fontawesome-all.min.js"></script>
+      <script src="js/highlight.min.js"></script>
+      <script src="js/scribbler-doc.js"></script>
+   </body>
+</html>
