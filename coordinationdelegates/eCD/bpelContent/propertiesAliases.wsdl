@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	name="propertiesAliases"
+	targetNamespace="http://it.univaq.incipict.ems/propertiesAliases"
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:properties="http://it.univaq.incipict.ems/properties"
+	xmlns:ecd="http://it.univaq.incipict.ems/eCD"
+	xmlns:cdshm="http://it.univaq.incipict.ems/cdShm"
+	xmlns:cdep="http://it.univaq.incipict.ems/cdEp">
+
+  <import location="eCD.wsdl" namespace="http://it.univaq.incipict.ems/eCD"/>
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+  <import location="cdEp.wsdl" namespace="http://it.univaq.incipict.ems/cdEp"/>
+
+  <vprop:propertyAlias messageType="ecd:executeChoreographyVPRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:executeVariationRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdep:executeVariationRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ecd:prepareRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>/</vprop:query>
+  </vprop:propertyAlias>
+
+</definitions>

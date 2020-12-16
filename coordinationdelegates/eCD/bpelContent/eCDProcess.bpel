@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes" name="eCDProcess.bpel"
+    targetNamespace="http://it.univaq.incipict.ems/eCD/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://it.univaq.incipict.ems/eCD/Artifacts"
+    xmlns:client="http://it.univaq.incipict.ems/eCD"
+	xmlns:cdshm="http://it.univaq.incipict.ems/cdShm"
+	xmlns:cdep="http://it.univaq.incipict.ems/cdEp"
+	xmlns:contextevaluator="http://it.univaq.incipict.ems/contextevaluator"
+	xmlns:properties="http://it.univaq.incipict.ems/properties">
+
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="eCDArtifacts.wsdl" namespace="http://it.univaq.incipict.ems/eCD/Artifacts"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="eCD.wsdl" namespace="http://it.univaq.incipict.ems/eCD"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdEp.wsdl" namespace="http://it.univaq.incipict.ems/cdEp"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="contextevaluator.wsdl" namespace="http://it.univaq.incipict.ems/contextevaluator"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="propertiesAliases.wsdl" namespace="http://it.univaq.incipict.ems/propertiesAliases"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="properties.wsdl" namespace="http://it.univaq.incipict.ems/properties"/>
+
+    <bpel:partnerLinks>
+        <bpel:partnerLink name="Client" myRole="Client" partnerLinkType="ns:ClientPLT"/>
+        <bpel:partnerLink name="cdShm" partnerRole="cdShm" partnerLinkType="ns:cdShmPLT"/>
+        <bpel:partnerLink name="cdEp" partnerRole="cdEp" partnerLinkType="ns:cdEpPLT"/>
+        <bpel:partnerLink name="ContextEvaluator" partnerRole="ContextEvaluator" partnerLinkType="ns:ContextEvaluatorPLT"/>
+    </bpel:partnerLinks>
+
+    <bpel:variables>
+        <bpel:variable messageType="client:executeChoreographyVPRequest" name="executeChoreographyVPRequest"/>
+        <bpel:variable messageType="contextevaluator:contextRequest" name="contextRequest"/>
+        <bpel:variable messageType="contextevaluator:contextResponse" name="contextResponse"/>
+        <bpel:variable messageType="cdshm:executeVariationRequest" name="cdShmExecuteVariationRequest"/>
+        <bpel:variable messageType="cdep:executeVariationRequest" name="cdEpExecuteVariationRequest"/>
+
+		<bpel:variable type="xsd:float" name="networkMaximumAvailableDataRate"/>
+		<bpel:variable type="xsd:float" name="networkLatency"/>
+
+		<bpel:variable messageType="client:prepareRequest" name="prepareRequest"/>
+
+		<bpel:variable name="myName" type="xsd:string"/>
+		<bpel:variable name="cdShmName" type="xsd:string"/>
+		<bpel:variable name="cdShmAddress" type="xsd:string"/>
+		<bpel:variable name="cdEpName" type="xsd:string"/>
+		<bpel:variable name="cdEpAddress" type="xsd:string"/>
+		<bpel:variable name="ContextEvaluatorName" type="xsd:string"/>
+		<bpel:variable name="ContextEvaluatorAddress" type="xsd:string"/>
+    </bpel:variables>
+
+	<bpel:correlationSets>
+		<bpel:correlationSet
+			name="CorrelationSetInstanceID" properties="properties:instanceID" />
+	</bpel:correlationSets>
+
+    <bpel:sequence name="MainSequence">
+
+		<bpel:receive createInstance="yes" operation="Prepare"
+    		partnerLink="Client" portType="client:eCDPT"
+    		variable="prepareRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+		<!-- Instancing name and address variables -->
+		<!-- Client -->
+		<bpel:assign name="assign_myName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>eCD</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="myName"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdShm -->
+        <bpel:assign name="assign_cdShmName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdShm</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdShmName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdShmAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="cdShm"/>
+            <bpel:to variable="cdShmAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdShmAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdShmName, $cdShmAddress)]]></bpel:from>
+            <bpel:to partnerLink="cdShm"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdEp -->
+        <bpel:assign name="assign_cdEpName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdEp</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdEpName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdEpAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="cdEp"/>
+            <bpel:to variable="cdEpAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdEpAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdEpName, $cdEpAddress)]]></bpel:from>
+            <bpel:to partnerLink="cdEp"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- ContextEvaluator -->
+        <bpel:assign name="assign_ContextEvaluatorName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>ContextEvaluator</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="ContextEvaluatorName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_ContextEvaluatorAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="ContextEvaluator"/>
+            <bpel:to variable="ContextEvaluatorAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_ContextEvaluatorAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $ContextEvaluatorName, $ContextEvaluatorAddress)]]></bpel:from>
+            <bpel:to partnerLink="ContextEvaluator"/>
+          </bpel:copy>
+        </bpel:assign>
+        <!-- /Instancing name and address variables -->
+
+        <bpel:receive
+        	createInstance="no"
+        	name="receive_executeChoreographyVP"
+        	operation="ExecuteChoreographyVP"
+    		partnerLink="Client"
+    		portType="client:eCDPT"
+    		variable="executeChoreographyVPRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+    		
+ 		<bpel:assign name="assign_contextRequest" validate="no">
+			<bpel:copy>
+				<bpel:from>
+					<bpel:literal>
+						<tns:contextRequest
+								xmlns:tns="http://it.univaq.incipict.ems/contextevaluator"
+								xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+								<contextName>DroneReconnaissance Context</contextName>
+						</tns:contextRequest>
+					</bpel:literal>
+				</bpel:from>
+				<bpel:to variable="contextRequest" part="request" />
+			</bpel:copy>
+		</bpel:assign>
+
+		<bpel:invoke
+			inputVariable="contextRequest"
+			name="invoke_GetChoreographyContext"
+			operation="GetChoreographyContext"
+			partnerLink="ContextEvaluator"
+			outputVariable="contextResponse"/>
+
+		<bpel:assign name="assign_networkMaximumAvailableDataRate_condition">
+			<bpel:copy>
+				<bpel:from variable="contextResponse" part="response">
+					<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+						<![CDATA[condition[name='Network Maximum Available Data Rate']//currentCondition[last()]]]>
+					</bpel:query>
+				</bpel:from>
+				<bpel:to variable="networkMaximumAvailableDataRate"></bpel:to>
+			</bpel:copy>
+		</bpel:assign>
+
+		<bpel:assign name="assign_networkLatency_condition">
+			<bpel:copy>
+				<bpel:from variable="contextResponse" part="response">
+					<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+						<![CDATA[condition[name='Network Latency']//currentCondition[last()]]]>
+					</bpel:query>
+				</bpel:from>
+				<bpel:to variable="networkLatency"></bpel:to>
+			</bpel:copy>
+		</bpel:assign>
+
+		<bpel:if>
+			<bpel:condition><![CDATA[$networkMaximumAvailableDataRate>100 and $networkLatency<20]]></bpel:condition>
+			<bpel:sequence>
+				<bpel:assign name="assign_cdShmExecuteVariationRequest" validate="no">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<tns:executeVariationRequest
+										xmlns:tns="http://it.univaq.incipict.ems/shm"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+										<name>v1</name>
+										<instanceId>InstanceID</instanceId>
+								</tns:executeVariationRequest>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="cdShmExecuteVariationRequest" part="request" />
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="executeChoreographyVPRequest" part="request"/>
+						<bpel:to variable="cdShmExecuteVariationRequest" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+				<bpel:assign name="assign_cdEpExecuteVariationRequest" validate="no">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<tns:executeVariationRequest
+										xmlns:tns="http://it.univaq.incipict.ems/ep"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+										<name>v1</name>
+										<instanceId>InstanceID</instanceId>
+								</tns:executeVariationRequest>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="cdEpExecuteVariationRequest" part="request" />
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="executeChoreographyVPRequest" part="request"/>
+						<bpel:to variable="cdEpExecuteVariationRequest" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+			</bpel:sequence>
+			<bpel:elseif>
+				<bpel:condition><![CDATA[$networkMaximumAvailableDataRate<100 and $networkLatency<20]]></bpel:condition>
+				<bpel:sequence>
+					<bpel:assign name="assign_cdShmExecuteVariationRequest" validate="no">
+						<bpel:copy>
+							<bpel:from>
+								<bpel:literal>
+									<tns:executeVariationRequest
+											xmlns:tns="http://it.univaq.incipict.ems/shm"
+											xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+											<name>v2</name>
+											<instanceId>InstanceID</instanceId>
+									</tns:executeVariationRequest>
+								</bpel:literal>
+							</bpel:from>
+							<bpel:to variable="cdShmExecuteVariationRequest" part="request" />
+						</bpel:copy>
+						<bpel:copy>
+							<bpel:from property="properties:instanceID" variable="executeChoreographyVPRequest" part="request"/>
+							<bpel:to variable="cdShmExecuteVariationRequest" part="request">
+								<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+									<![CDATA[instanceId]]>
+								</bpel:query>
+							</bpel:to>
+						</bpel:copy>
+					</bpel:assign>
+					<bpel:assign name="assign_cdEpExecuteVariationRequest" validate="no">
+						<bpel:copy>
+							<bpel:from>
+								<bpel:literal>
+									<tns:executeVariationRequest
+											xmlns:tns="http://it.univaq.incipict.ems/ep"
+											xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+											<name>v2</name>
+											<instanceId>InstanceID</instanceId>
+									</tns:executeVariationRequest>
+								</bpel:literal>
+							</bpel:from>
+							<bpel:to variable="cdEpExecuteVariationRequest" part="request" />
+						</bpel:copy>
+						<bpel:copy>
+							<bpel:from property="properties:instanceID" variable="executeChoreographyVPRequest" part="request"/>
+							<bpel:to variable="cdEpExecuteVariationRequest" part="request">
+								<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+									<![CDATA[instanceId]]>
+								</bpel:query>
+							</bpel:to>
+						</bpel:copy>
+					</bpel:assign>
+				</bpel:sequence>
+			</bpel:elseif>
+			<bpel:else>
+				<bpel:sequence>
+					<bpel:assign name="assign_cdShmExecuteVariationRequest" validate="no">
+						<bpel:copy>
+							<bpel:from>
+								<bpel:literal>
+									<tns:executeVariationRequest
+											xmlns:tns="http://it.univaq.incipict.ems/shm"
+											xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+											<name>v3</name>
+											<instanceId>InstanceID</instanceId>
+									</tns:executeVariationRequest>
+								</bpel:literal>
+							</bpel:from>
+							<bpel:to variable="cdShmExecuteVariationRequest" part="request" />
+						</bpel:copy>
+						<bpel:copy>
+							<bpel:from property="properties:instanceID" variable="executeChoreographyVPRequest" part="request"/>
+							<bpel:to variable="cdShmExecuteVariationRequest" part="request">
+								<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+									<![CDATA[instanceId]]>
+								</bpel:query>
+							</bpel:to>
+						</bpel:copy>
+					</bpel:assign>
+					<bpel:assign name="assign_cdEpExecuteVariationRequest" validate="no">
+						<bpel:copy>
+							<bpel:from>
+								<bpel:literal>
+									<tns:executeVariationRequest
+											xmlns:tns="http://it.univaq.incipict.ems/ep"
+											xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+											<name>v3</name>
+											<instanceId>InstanceID</instanceId>
+									</tns:executeVariationRequest>
+								</bpel:literal>
+							</bpel:from>
+							<bpel:to variable="cdEpExecuteVariationRequest" part="request" />
+						</bpel:copy>
+						<bpel:copy>
+							<bpel:from property="properties:instanceID" variable="executeChoreographyVPRequest" part="request"/>
+							<bpel:to variable="cdEpExecuteVariationRequest" part="request">
+								<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+									<![CDATA[instanceId]]>
+								</bpel:query>
+							</bpel:to>
+						</bpel:copy>
+					</bpel:assign>
+				</bpel:sequence>
+			</bpel:else>
+		</bpel:if>
+		<bpel:invoke
+			inputVariable="cdShmExecuteVariationRequest"
+			name="invoke_cdShmExecuteVariation"
+			operation="ExecuteVariation"
+			partnerLink="cdShm">
+			<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+		</bpel:invoke>
+		<bpel:invoke
+			inputVariable="cdEpExecuteVariationRequest"
+			name="invoke_cdEpExecuteVariation"
+			operation="ExecuteVariation"
+			partnerLink="cdEp">
+			<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+		</bpel:invoke>
+		<bpel:exit/>
+    </bpel:sequence>
+</bpel:process>

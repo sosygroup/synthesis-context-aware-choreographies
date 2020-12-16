@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/smartevacuation"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="smartevacuation"
+	targetNamespace="http://it.univaq.incipict.ems/smartevacuation">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/smartevacuation">
+		<xsd:element name="sendPlanRequest" type="tns:alarmInfo"/>
+		<xsd:element name="sendPlanResponse" type="tns:sendPlanResponse"/>
+		<xsd:element name="activatePanelsRequest" type="tns:activationRequest"/>
+
+        <xsd:complexType name="alarmInfo">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="timestamp" type="xsd:dateTime" />
+		      <xsd:element name="emergencyType" type="tns:emergencyType" />
+		      <xsd:element name="areaCode" type="xsd:string" maxOccurs="unbounded" />
+		    </xsd:sequence>
+	  	</xsd:complexType>
+
+        <xsd:complexType name="sendPlanResponse">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="evacuationId" type="xsd:string"/>
+		    </xsd:sequence>
+	  	</xsd:complexType>
+
+		<xsd:complexType name="activationRequest">
+			<xsd:sequence>
+				<xsd:element name="alarmCode" type="xsd:string" />
+				<xsd:element name="evacuationId" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:simpleType name="emergencyType">
+		    <xsd:restriction base="xsd:string">
+		      <xsd:enumeration value="earthquake" />
+		      <xsd:enumeration value="fire" />
+		      <xsd:enumeration value="generalemergency" />
+		    </xsd:restriction>
+	  	</xsd:simpleType>
+		
+	</xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="sendPlanRequest">
+    <wsdl:part element="tns:sendPlanRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="sendPlanResponse">
+  	<wsdl:part element="tns:sendPlanResponse" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="activatePanelsRequest">
+  	<wsdl:part element="tns:activatePanelsRequest" name="request"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="smartevacuationPT">
+    <wsdl:operation name="SendPlan">
+      <wsdl:input message="tns:sendPlanRequest"/>
+      <wsdl:output message="tns:sendPlanResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="ActivatePanels">
+   	  <wsdl:input message="tns:activatePanelsRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="smartevacuationBinding" type="tns:smartevacuationPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="SendPlan">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ActivatePanels">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="smartevacuationService">
+    <wsdl:port binding="tns:smartevacuationBinding" name="smartevacuationPort">
+      <soap:address location="http://localhost:9080/smartevacuation/smartevacuation"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes" name="cdEarlywarningsystemProcess.bpel"
+    targetNamespace="http://it.univaq.incipict.ems/cdEarlywarningsystem/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://it.univaq.incipict.ems/cdEarlywarningsystem/Artifacts"
+    xmlns:client="http://it.univaq.incipict.ems/cdEarlywarningsystem"
+    xmlns:sae="http://it.univaq.incipict.ems/cdSae"
+    xmlns:shm="http://it.univaq.incipict.ems/cdShm"
+    xmlns:properties="http://it.univaq.incipict.ems/properties">
+
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdEarlywarningsystemArtifacts.wsdl" namespace="http://it.univaq.incipict.ems/cdEarlywarningsystem/Artifacts"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdEarlywarningsystem.wsdl" namespace="http://it.univaq.incipict.ems/cdEarlywarningsystem"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdSae.wsdl" namespace="http://it.univaq.incipict.ems/cdSae"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="propertiesAliases.wsdl" namespace="http://it.univaq.incipict.ems/propertiesAliases"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="properties.wsdl" namespace="http://it.univaq.incipict.ems/properties"/>
+
+    <bpel:partnerLinks>
+        <bpel:partnerLink name="Client" myRole="Client" partnerLinkType="ns:ClientPLT"/>
+        <bpel:partnerLink name="Sae" partnerRole="Sae" partnerLinkType="ns:SaePLT"/>
+        <bpel:partnerLink name="Shm" partnerRole="Shm" partnerLinkType="ns:ShmPLT"/>
+        <bpel:partnerLink name="cdSaeCoordination" partnerRole="cdSae" partnerLinkType="ns:cdSaeCoordinationPLT"/>
+    </bpel:partnerLinks>
+
+    <bpel:variables>
+        <bpel:variable messageType="client:signalEventRequest" name="signalEventRequest"/>
+        <bpel:variable messageType="sae:signalEventRequest" name="forwardSignalEventRequest"/>
+
+		<bpel:variable messageType="client:endEventRequest" name="endEventRequest"/>
+        <bpel:variable messageType="shm:endEventRequest" name="forwardEndEventRequest"/>
+
+		<bpel:variable messageType="sae:coordinationRequest" name="cdSaeCoordinationRequest"/>
+
+		<bpel:variable messageType="client:prepareRequest" name="prepareRequest"/>
+
+		<bpel:variable name="myName" type="xsd:string"/>
+		<bpel:variable name="cdSaeName" type="xsd:string"/>
+		<bpel:variable name="cdSaeAddress" type="xsd:string"/>
+		<bpel:variable name="cdShmName" type="xsd:string"/>
+		<bpel:variable name="cdShmAddress" type="xsd:string"/>
+		<bpel:variable name="cdSaeCoordinationName" type="xsd:string"/>
+		<bpel:variable name="cdSaeCoordinationAddress" type="xsd:string"/>
+    </bpel:variables>
+
+	<bpel:correlationSets>
+		<bpel:correlationSet
+			name="CorrelationSetInstanceID" properties="properties:instanceID" />
+	</bpel:correlationSets>
+
+    <bpel:sequence name="MainSequence">
+
+		<bpel:receive createInstance="yes" operation="Prepare"
+    		partnerLink="Client" portType="client:cdEarlywarningsystemPT"
+    		variable="prepareRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+		<!-- Instancing name and address variables -->
+		<!-- Client -->
+		<bpel:assign name="assign_myName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdDrone</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="myName"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdSae -->
+        <bpel:assign name="assign_cdSaeName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdSae</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdSaeName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdSaeAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="Sae"/>
+            <bpel:to variable="cdSaeAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdSaeAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdSaeName, $cdSaeAddress)]]></bpel:from>
+            <bpel:to partnerLink="Sae"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdShm -->
+        <bpel:assign name="assign_cdShmName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdShm</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdShmName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdShmAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="Shm"/>
+            <bpel:to variable="cdShmAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdShmAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdShmName, $cdShmAddress)]]></bpel:from>
+            <bpel:to partnerLink="Shm"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdSae -->
+        <bpel:assign name="assign_cdSaeCoordinationName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdSaeCoordination</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdSaeCoordinationName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdSaeCoordinationAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="cdSaeCoordination"/>
+            <bpel:to variable="cdSaeCoordinationAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdSaeCoordinationAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdSaeCoordinationName, $cdSaeCoordinationAddress)]]></bpel:from>
+            <bpel:to partnerLink="cdSaeCoordination"/>
+          </bpel:copy>
+        </bpel:assign>
+        <!-- \Instancing name and address variables -->
+
+		<bpel:receive createInstance="no" operation="SignalEvent"
+    		partnerLink="Client" portType="client:cdEarlywarningsystemPT"
+    		variable="signalEventRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+    		
+ 		<bpel:assign name="assign_forwardSignalEventRequest" validate="no">
+			<bpel:copy>
+				<bpel:from variable="signalEventRequest" part="request" />
+				<bpel:to variable="forwardSignalEventRequest" part="request" />
+			</bpel:copy>
+		</bpel:assign>
+
+		<bpel:invoke
+			inputVariable="forwardSignalEventRequest"
+			name="invoke_signalEvent"
+			operation="SignalEvent"
+			partnerLink="Sae"/>
+
+		<bpel:receive createInstance="no" operation="SignalEndEvent"
+    		partnerLink="Client" portType="client:cdEarlywarningsystemPT"
+    		variable="endEventRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+ 		<bpel:assign name="assign_forwardSignalEndEventRequest" validate="no">
+			<bpel:copy>
+				<bpel:from variable="endEventRequest" part="request" />
+				<bpel:to variable="forwardEndEventRequest" part="request" />
+			</bpel:copy>
+		</bpel:assign>
+
+		<bpel:invoke
+			inputVariable="forwardEndEventRequest"
+			name="invoke_signalEndEvent"
+			operation="SignalEndEvent"
+			partnerLink="Shm"/>
+
+		<!-- Send coordination message to SAE-->
+		<bpel:assign name="assign_cdSaeCoordinationRequest" validate="no">
+			<bpel:copy>
+				<bpel:from>
+					<bpel:literal>
+						<tns:coordinationRequest
+								xmlns:tns="http://it.univaq.incipict.ems/shm"
+								xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+								<instanceId>InstanceID</instanceId>
+						</tns:coordinationRequest>
+					</bpel:literal>
+				</bpel:from>
+				<bpel:to variable="cdSaeCoordinationRequest" part="request"/>
+			</bpel:copy>
+			<bpel:copy>
+				<bpel:from property="properties:instanceID" variable="endEventRequest" part="request"/>
+				<bpel:to variable="cdSaeCoordinationRequest" part="request">
+					<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+						<![CDATA[instanceId]]>
+					</bpel:query>
+				</bpel:to>
+			</bpel:copy>
+		</bpel:assign>
+		<bpel:invoke
+			inputVariable="cdSaeCoordinationRequest"
+			name="invoke_StepCoordinationPoint1"
+			operation="StepCoordinationPoint1"
+			partnerLink="cdSaeCoordination">
+			<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+		</bpel:invoke>
+
+		<bpel:exit/>
+    </bpel:sequence>
+</bpel:process>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/contextevaluator"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="contextevaluator"
+	targetNamespace="http://it.univaq.incipict.ems/contextevaluator">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/contextevaluator">
+    	<xsd:element name="contextRequest" type="tns:contextRequest"></xsd:element>
+    	<xsd:element name="contextResponse" type="tns:contextResponse"></xsd:element>
+
+		<xsd:complexType name="contextRequest">
+			<xsd:sequence>
+				<xsd:element name="contextName" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="contextResponse">
+			<xsd:sequence>
+				<xsd:element name="context" type="xsd:string"/>
+				<xsd:element name="condition" type="tns:condition" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="condition">
+			<xsd:sequence>
+				<xsd:element name="name" type="xsd:string" />
+				<xsd:element name="currentCondition" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="contextRequest">
+    <wsdl:part element="tns:contextRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="contextResponse">
+    <wsdl:part element="tns:contextResponse" name="response"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="ContextEvaluatorPT">
+    <wsdl:operation name="GetChoreographyContext">
+      <wsdl:input message="tns:contextRequest"/>
+      <wsdl:output message="tns:contextResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="ContextEvaluatorBinding" type="tns:ContextEvaluatorPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetChoreographyContext">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="roasService">
+    <wsdl:port binding="tns:ContextEvaluatorBinding" name="ContextEvaluatorPort">
+      <soap:address location="http://localhost:9080/contextevaluator/contextevaluator"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

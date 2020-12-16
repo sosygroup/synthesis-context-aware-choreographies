@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	name="propertiesAliases"
+	targetNamespace="http://it.univaq.incipict.ems/propertiesAliases"
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:properties="http://it.univaq.incipict.ems/properties"
+	xmlns:cdshm="http://it.univaq.incipict.ems/cdShm"
+	xmlns:cdsae="http://it.univaq.incipict.ems/cdSae"
+	xmlns:cdearlywarning="http://it.univaq.incipict.ems/cdEarlywarningsystem">
+
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+  <import location="cdSae.wsdl" namespace="http://it.univaq.incipict.ems/cdSae"/>
+  <import location="cdEarlywarningsystem.wsdl" namespace="http://it.univaq.incipict.ems/cdEarlywarningsystem"/>
+
+  <vprop:propertyAlias messageType="cdearlywarning:signalEventRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>eventCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdearlywarning:endEventRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>eventCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdsae:signalEventRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>eventCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:endEventRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>eventCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdsae:coordinationRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdearlywarning:prepareRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>/</vprop:query>
+  </vprop:propertyAlias>
+
+</definitions>

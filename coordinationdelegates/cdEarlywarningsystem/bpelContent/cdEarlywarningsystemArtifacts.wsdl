@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions
+	targetNamespace="http://it.univaq.incipict.ems/cdEarlywarningsystem/Artifacts"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:client="http://it.univaq.incipict.ems/cdEarlywarningsystem"
+	xmlns:shm="http://it.univaq.incipict.ems/cdShm"
+	xmlns:sae="http://it.univaq.incipict.ems/cdSae">
+  
+  <partnerLinkType name="ClientPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Client" portType="client:cdEarlywarningsystemPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="ShmPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Shm" portType="shm:cdShmPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="SaePLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Sae" portType="sae:cdSaePT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="cdSaeCoordinationPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="cdSae" portType="sae:cdSaeCoordinationPT"/>
+  </partnerLinkType>  
+
+  <import location="cdEarlywarningsystem.wsdl" namespace="http://it.univaq.incipict.ems/cdEarlywarningsystem"/>
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+  <import location="cdSae.wsdl" namespace="http://it.univaq.incipict.ems/cdSae"/>
+
+</definitions>

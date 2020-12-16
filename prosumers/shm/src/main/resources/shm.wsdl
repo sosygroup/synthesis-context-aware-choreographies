@@ -1,0 +1,457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/shm"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="shm"
+	targetNamespace="http://it.univaq.incipict.ems/shm">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/shm">
+
+		<xsd:element name="endEventRequest" type="tns:endEvent"/>
+		<xsd:element name="getBuildingDataMessageInput" type="tns:instanceInfo"/>
+		<xsd:element name="getBuildingDataRequest" type="tns:getBuildingDataRequest"/>
+    	<xsd:element name="rawBuildingDataResponse" type="tns:rawBuildingDataResponse"/>
+    	<xsd:element name="getSendBuildingDataMessageInput" type="tns:instanceInfo"/>
+ 		<xsd:element name="buildingDataRequest" type="tns:buildingDataList"/>
+ 		<xsd:element name="getSecureBuildingsMessageInput" type="tns:instanceInfo"/>
+ 		<xsd:element name="secureBuildingsRequest" type="tns:buildingList"/>
+ 		<xsd:element name="getCloseRoadsMessageInput" type="tns:instanceInfo"/>
+ 		<xsd:element name="closeRoadsRequest" type="tns:closeRoadsList"/>
+ 		<xsd:element name="checkpointDescriptionRequest" type="tns:checkpointDescription"/>
+ 		<xsd:element name="livePhotogrammetryRequest" type="tns:livePhotogrammetry"/>
+ 		<xsd:element name="sendLiveFlightDetailsMessageInput" type="tns:instanceInfo"/>
+ 		<xsd:element name="sendLiveFlightDetailsRequest" type="tns:flightDetails"/>
+ 		<xsd:element name="sendSimpleFlightDetailsMessageInput" type="tns:instanceInfo"/>
+ 		<xsd:element name="sendSimpleFlightDetailsRequest" type="tns:flightDetails"/>
+ 		<xsd:element name="updateBuildingDataMessageInput" type="tns:instanceInfo"/>
+ 		<xsd:element name="updateBuildingDataRequest" type="tns:buildingDataList"/>
+ 		<xsd:element name="sendMissingDataAcknowledgementMessageInput" type="tns:instanceInfo"/>
+ 		<xsd:element name="missingDataAcknowledgementRequest" type="tns:buildingDataList"/>
+ 		<xsd:element name="emptyResponse" type="tns:emptyResponse"/>
+
+		<xsd:complexType name="endEvent">
+			<xsd:sequence>
+				<xsd:element name="eventCode" type="xsd:string"/>
+				<xsd:element name="timestamp" type="xsd:dateTime"/>
+				<xsd:element name="duration" type="xsd:integer"/>
+				<xsd:element name="estimatedMagnitude" type="xsd:float"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="getBuildingDataRequest">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="areaCode" type="xsd:string" maxOccurs="unbounded" />
+		    </xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="rawBuildingDataResponse">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="buildingData" type="tns:rawBuildingData" maxOccurs="unbounded" />
+		    </xsd:sequence>
+		  </xsd:complexType>
+		
+		  <xsd:complexType name="rawBuildingData">
+		    <xsd:sequence>
+		      <xsd:element name="buildingID" type="xsd:string" />
+		      <xsd:element name="sensorData" type="tns:sensorData" maxOccurs="unbounded"/>
+		    </xsd:sequence>
+		  </xsd:complexType>
+		
+		  <xsd:complexType name="sensorData">
+		    <xsd:sequence>
+		      <xsd:element name="sensorID" type="xsd:string" />
+		      <xsd:element name="timestamp" type="xsd:dateTime" />
+		      <xsd:element name="x" type="xsd:double" />
+		      <xsd:element name="y" type="xsd:double" />
+		      <xsd:element name="z" type="xsd:double" />
+		    </xsd:sequence>
+		  </xsd:complexType>
+
+		  <xsd:complexType name="buildingDataList">
+		  	<xsd:sequence>
+	  		  <xsd:element name="alarmCode" type="xsd:string"/>
+		  	  <xsd:element name="buildingData" type="tns:buildingData" maxOccurs="unbounded"/>
+		  	</xsd:sequence>
+		  </xsd:complexType>
+
+		  <xsd:complexType name="buildingData">
+		  	<xsd:sequence>
+		  	  <xsd:element name="buildingID" type="xsd:string"/>
+		  	  <xsd:element name="status" type="tns:buildingClass"/>
+		  	</xsd:sequence>
+		  </xsd:complexType>
+
+		  <xsd:simpleType name="buildingClass">
+		  	<xsd:restriction base="xsd:string">
+		  	  <xsd:enumeration value="A"/>
+		  	  <xsd:enumeration value="B"/>
+		  	  <xsd:enumeration value="C"/>
+		  	  <xsd:enumeration value="D"/>
+		  	  <xsd:enumeration value="E"/>
+		  	  <xsd:enumeration value="F"/>
+		  	</xsd:restriction>
+		  </xsd:simpleType>
+
+		<xsd:complexType name="buildingList">
+			<xsd:sequence>
+			  <xsd:element name="alarmCode" type="xsd:string"/>
+			  <xsd:element name="buildingCode" type="xsd:string" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="closeRoadsList">
+			<xsd:sequence>
+				<xsd:element name="alarmCode" type="xsd:string"/>
+				<xsd:element name="road" type="tns:road" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="road">
+			<xsd:sequence>
+				<xsd:element name="roadCode" type="xsd:string" />
+				<xsd:element name="from" type="xsd:double" />
+				<xsd:element name="to" type="xsd:double" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="livePhotogrammetry">
+			<xsd:sequence>
+				<xsd:element name="flightId" type="xsd:string" />
+				<xsd:element name="photogrammetry" type="tns:photogrammetry" />
+				<xsd:element name="sequence" type="xsd:integer" />
+				<xsd:element name="continue" type="xsd:boolean" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="photogrammetry">
+			<xsd:sequence>
+				<xsd:element name="checkpointId" type="xsd:string"/>
+				<xsd:element name="metadata" type="xsd:string"/>
+				<xsd:element name="photogrammetry" type="xsd:base64Binary"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="checkpointDescription">
+			<xsd:sequence>
+				<xsd:element name="flightId" type="xsd:string" />
+				<xsd:element name="checkpointId" type="xsd:string" />
+				<xsd:element name="status" type="tns:buildingClass" />
+				<xsd:element name="sequence" type="xsd:integer" />
+				<xsd:element name="continue" type="xsd:boolean" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="flightDetails">
+			<xsd:sequence>
+				<xsd:element name="flightId" type="xsd:string"/>
+				<xsd:element name="checkpoints" type="tns:checkpoint" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	
+		<xsd:complexType name="checkpoint">
+			<xsd:sequence>
+				<xsd:element name="id" type="xsd:string"/>
+				<xsd:element name="coordinates" type="tns:coordinates"/>
+				<xsd:element name="inspectRadius" type="xsd:float"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="coordinates">
+			<xsd:sequence>
+				<xsd:element name="latitude" type="xsd:float" />
+				<xsd:element name="longitude" type="xsd:float" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="instanceInfo">
+			<xsd:sequence>
+				<xsd:element name="instanceId" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="emptyResponse">
+			<xsd:sequence/>
+		</xsd:complexType>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="endEventRequest">
+    <wsdl:part element="tns:endEventRequest" name="request"/>
+  </wsdl:message>
+    <wsdl:message name="getBuildingDataMessageInput">
+  	<wsdl:part element="tns:getBuildingDataMessageInput" name="request"/>
+  </wsdl:message> 
+  <wsdl:message name="getBuildingDataRequest">
+    <wsdl:part element="tns:getBuildingDataRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="rawBuildingDataResponse">
+  	<wsdl:part element="tns:rawBuildingDataResponse" name="message"/>
+  </wsdl:message>
+  <wsdl:message name="getSendBuildingDataMessageInput">
+  	<wsdl:part element="tns:getSendBuildingDataMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="buildingDataRequest">
+  	<wsdl:part element="tns:buildingDataRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getSecureBuildingsMessageInput">
+  	<wsdl:part element="tns:getSecureBuildingsMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="secureBuildingsRequest">
+  	<wsdl:part element="tns:secureBuildingsRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getCloseRoadsMessageInput">
+  	<wsdl:part element="tns:getCloseRoadsMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="closeRoadsRequest">
+  	<wsdl:part element="tns:closeRoadsRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="livePhotogrammetryRequest">
+  	<wsdl:part element="tns:livePhotogrammetryRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="checkpointDescriptionRequest">
+  	<wsdl:part element="tns:checkpointDescriptionRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getSendLiveFlightDetailsMessageInput">
+  	<wsdl:part element="tns:sendLiveFlightDetailsMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="sendLiveFlightDetailsRequest">
+  	<wsdl:part element="tns:sendLiveFlightDetailsRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getSendSimpleFlightDetailsMessageInput">
+  	<wsdl:part element="tns:sendSimpleFlightDetailsMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="sendSimpleFlightDetailsRequest">
+  	<wsdl:part element="tns:sendSimpleFlightDetailsRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getUpdateBuildingDataMessageInput">
+  	<wsdl:part element="tns:updateBuildingDataMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="updateBuildingDataRequest">
+  	<wsdl:part element="tns:updateBuildingDataRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getSendMissingDataAcknowledgementMessageInput">
+  	<wsdl:part element="tns:sendMissingDataAcknowledgementMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="missingDataAcknowledgementRequest">
+  	<wsdl:part element="tns:missingDataAcknowledgementRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="emptyResponse">
+  	<wsdl:part element="tns:emptyResponse" name="response"/>
+  </wsdl:message>
+
+  <!-- Provider Part -->
+  <wsdl:portType name="shmPT">
+    <wsdl:operation name="SignalEndEvent">
+      <wsdl:input message="tns:endEventRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendLivePhotogrammetry">
+      <wsdl:input message="tns:livePhotogrammetryRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendCheckpointDescription">
+      <wsdl:input message="tns:checkpointDescriptionRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="shmBinding" type="tns:shmPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="SignalEndEvent">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="SendLivePhotogrammetry">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="SendCheckpointDescription">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <!-- Consumer Part -->
+  <wsdl:portType name="shmConsumerPT">
+  	<wsdl:operation name="storeEndEventRequest">
+  	  <wsdl:input message="tns:endEventRequest"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+    <wsdl:operation name="getGetBuildingDataMessage">
+   	  <wsdl:input message="tns:getBuildingDataMessageInput"/>
+      <wsdl:output message="tns:getBuildingDataRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="storeGetBuildingDataResponse">
+  	  <wsdl:input message="tns:rawBuildingDataResponse"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="getSendBuildingDataMessage">
+      <wsdl:input message="tns:getSendBuildingDataMessageInput"/>
+      <wsdl:output message="tns:buildingDataRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSecureBuildingsMessage">
+      <wsdl:input message="tns:getSecureBuildingsMessageInput"/>
+      <wsdl:output message="tns:secureBuildingsRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="getCloseRoadsMessage">
+      <wsdl:input message="tns:getCloseRoadsMessageInput"/>
+      <wsdl:output message="tns:closeRoadsRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="storeLivePhotogrammetryRequest">
+  	  <wsdl:input message="tns:livePhotogrammetryRequest"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="storeCheckpointDescriptionRequest">
+  	  <wsdl:input message="tns:checkpointDescriptionRequest"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="getSendLiveFlightDetailsMessage">
+   	  <wsdl:input message="tns:getSendLiveFlightDetailsMessageInput"/>
+      <wsdl:output message="tns:sendLiveFlightDetailsRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSendSimpleFlightDetailsMessage">
+   	  <wsdl:input message="tns:getSendSimpleFlightDetailsMessageInput"/>
+      <wsdl:output message="tns:sendSimpleFlightDetailsRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="getUpdateBuildingDataMessage">
+   	  <wsdl:input message="tns:getUpdateBuildingDataMessageInput"/>
+      <wsdl:output message="tns:updateBuildingDataRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSendMissingDataAcknowledgementMessage">
+   	  <wsdl:input message="tns:getSendMissingDataAcknowledgementMessageInput"/>
+      <wsdl:output message="tns:missingDataAcknowledgementRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="shmConsumerBinding" type="tns:shmConsumerPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="storeEndEventRequest">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGetBuildingDataMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="storeGetBuildingDataResponse">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSendBuildingDataMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSecureBuildingsMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCloseRoadsMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="storeLivePhotogrammetryRequest">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="storeCheckpointDescriptionRequest">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSendLiveFlightDetailsMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSendSimpleFlightDetailsMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUpdateBuildingDataMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSendMissingDataAcknowledgementMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="shmConsumerService">
+  	<!-- Provider part binding -->
+  	<wsdl:port binding="tns:shmBinding" name="shmPort">
+      <soap:address location="http://localhost:9080/shm/shm"/>
+    </wsdl:port>
+    <!-- Consumer part binding -->
+    <wsdl:port binding="tns:shmConsumerBinding" name="shmConsumerPort">
+      <soap:address location="http://localhost:9080/shm/consumer"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

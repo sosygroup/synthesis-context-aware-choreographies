@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:cdEp="http://it.univaq.incipict.ems/cdEp/" xmlns:cdEp_1="http://it.univaq.incipict.ems/cdEp" xmlns:civilprotection="http://it.univaq.incipict.ems/civilprotection" xmlns:crowding="http://it.univaq.incipict.ems/crowding" xmlns:ep="http://it.univaq.incipict.ems/ep" xmlns:it.univaq.inicipict.mid1.sia="http://it.univaq.inicipict.mid1.sia/">
+  <process name="cdEp:cdEpProcess.bpel">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="EpClient">
+      <service name="cdEp_1:cdEpService" port="cdEpPort"/>
+    </provide>
+    <invoke partnerLink="EpProvider">
+      <service name="ep:epService" port="epPort"/>
+    </invoke>
+    <invoke partnerLink="EpConsumer">
+      <service name="ep:epService" port="epConsumerPort"/>
+    </invoke>
+    <invoke partnerLink="Crowding">
+      <service name="crowding:crowdingService" port="crowdingPort"/>
+    </invoke>
+    <invoke partnerLink="CivilProtection">
+      <service name="civilprotection:civilprotectionService" port="CivilProtectionPort"/>
+    </invoke>
+  </process>
+  <process name="it.univaq.inicipict.mid1.sia:InvocationAddressService">
+    <process-events generate="all"/>
+    <provide partnerLink="SIAService">
+      <service name="it.univaq.inicipict.mid1.sia:cdEpSetInvocationAddressService" port="SetInvocationAddressServicePort"/>
+    </provide>
+  </process>
+</deploy>

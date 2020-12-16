@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/dronefleetcontroller"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="dronefleetcontroller"
+	targetNamespace="http://it.univaq.incipict.ems/dronefleetcontroller">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/dronefleetcontroller">
+    	<xsd:element name="sendLiveFlightDetailsRequest" type="tns:flightDetails"/>
+    	<xsd:element name="sendSimpleFlightDetailsRequest" type="tns:flightDetails"/>
+    	<xsd:element name="getDroneConfigurationRequest" type="tns:void"/>
+    	<xsd:element name="getDroneConfigurationResponse" type="tns:droneConfiguration"/>
+
+		<xsd:complexType name="flightDetails">
+			<xsd:sequence>
+				<xsd:element name="flightId" type="xsd:string"/>
+				<xsd:element name="checkpoints" type="tns:checkpoint" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	
+		<xsd:complexType name="checkpoint">
+			<xsd:sequence>
+				<xsd:element name="id" type="xsd:string"/>
+				<xsd:element name="coordinates" type="tns:coordinates"/>
+				<xsd:element name="inspectRadius" type="xsd:float"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="coordinates">
+			<xsd:sequence>
+				<xsd:element name="latitude" type="xsd:float" />
+				<xsd:element name="longitude" type="xsd:float" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="droneConfiguration">
+			<xsd:sequence>
+				<xsd:element name="liveImages" type="xsd:boolean" />
+				<xsd:element name="flightId" type="xsd:string" />
+				<xsd:element name="checkpoints" type="tns:checkpoint" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="void">
+			<xsd:sequence/>
+		</xsd:complexType>
+
+	</xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="sendLiveFlightDetailsRequest">
+    <wsdl:part element="tns:sendLiveFlightDetailsRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="sendSimpleFlightDetailsRequest">
+    <wsdl:part element="tns:sendSimpleFlightDetailsRequest" name="request"/>
+  </wsdl:message>
+
+  <wsdl:message name="getDroneConfigurationRequest">
+    <wsdl:part element="tns:getDroneConfigurationRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getDroneConfigurationResponse">
+    <wsdl:part element="tns:getDroneConfigurationResponse" name="response"/>
+  </wsdl:message>
+
+  <wsdl:portType name="DroneFleetControllerPT">
+    <wsdl:operation name="sendLiveFlightDetails">
+      <wsdl:input message="tns:sendLiveFlightDetailsRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="sendSimpleFlightDetails">
+      <wsdl:input message="tns:sendSimpleFlightDetailsRequest"/>
+    </wsdl:operation>
+
+	<!-- Endpoint for drone configuration -->
+	<wsdl:operation name="getDroneConfiguration">
+      <wsdl:input message="tns:getDroneConfigurationRequest"/>
+      <wsdl:output message="tns:getDroneConfigurationResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="DroneFleetControllerBinding" type="tns:DroneFleetControllerPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sendLiveFlightDetails">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="sendSimpleFlightDetails">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+
+	<!-- Endpoint for drone configuration -->
+	<wsdl:operation name="getDroneConfiguration">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="dronefleetcontrollerService">
+    <wsdl:port binding="tns:DroneFleetControllerBinding" name="DroneFleetControllerPort">
+      <soap:address location="http://localhost:9080/dronefleetcontroller/dronefleetcontroller"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

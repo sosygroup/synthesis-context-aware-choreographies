@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	name="propertiesAliases"
+	targetNamespace="http://it.univaq.incipict.ems/propertiesAliases"
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:properties="http://it.univaq.incipict.ems/properties"
+	xmlns:cdep="http://it.univaq.incipict.ems/cdEp"
+	xmlns:ep="http://it.univaq.incipict.ems/ep">
+
+  <import location="cdEp.wsdl" namespace="http://it.univaq.incipict.ems/cdEp"/>
+  <import location="ep.wsdl" namespace="http://it.univaq.incipict.ems/ep"/>
+
+  <vprop:propertyAlias messageType="cdep:buildingDataRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdep:updateBuildingDataRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdep:missingDataAcknowledgementRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdep:executeVariationRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ep:buildingDataRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ep:updateBuildingDataRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ep:missingDataAcknowledgementRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ep:getCrowdingDataMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ep:getSendInterventionPlanMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ep:getSendBuildingDataMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ep:getUpdateInterventionPlanMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ep:getSendNotificationMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdep:prepareRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>/</vprop:query>
+  </vprop:propertyAlias>
+</definitions>

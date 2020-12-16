@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:cdBsa="http://it.univaq.incipict.ems/cdBsa" xmlns:cdEp="http://it.univaq.incipict.ems/cdEp" xmlns:cdShm="http://it.univaq.incipict.ems/cdShm/" xmlns:cdShm_1="http://it.univaq.incipict.ems/cdShm" xmlns:dronefleetcontroller="http://it.univaq.incipict.ems/dronefleetcontroller" xmlns:eCD="http://it.univaq.incipict.ems/eCD" xmlns:it.univaq.inicipict.mid1.sia="http://it.univaq.inicipict.mid1.sia/" xmlns:roads="http://it.univaq.incipict.ems/roads" xmlns:sensornetwork="http://it.univaq.incipict.ems/sensornetwork" xmlns:shm="http://it.univaq.incipict.ems/shm">
+  <process name="cdShm:cdShmProcess.bpel">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="ShmClient">
+      <service name="cdShm_1:cdShmService" port="cdShmPort"/>
+    </provide>
+    <provide partnerLink="ShmClientCoordination">
+      <service name="cdShm_1:cdShmService" port="cdShmCoordinationPort"/>
+    </provide>
+    <invoke partnerLink="eCD">
+      <service name="eCD:eCDService" port="eCDPort"/>
+    </invoke>
+    <invoke partnerLink="ShmProvider">
+      <service name="shm:shmConsumerService" port="shmPort"/>
+    </invoke>
+    <invoke partnerLink="ShmConsumer">
+      <service name="shm:shmConsumerService" port="shmConsumerPort"/>
+    </invoke>
+    <invoke partnerLink="Bsa">
+      <service name="cdBsa:cdBsaService" port="cdBsaPort"/>
+    </invoke>
+    <invoke partnerLink="Ep">
+      <service name="cdEp:cdEpService" port="cdEpPort"/>
+    </invoke>
+    <invoke partnerLink="Roads">
+      <service name="roads:roadsService" port="roadsPort"/>
+    </invoke>
+    <invoke partnerLink="SensorNetwork">
+      <service name="sensornetwork:sensornetworkService" port="SensorNetworkPort"/>
+    </invoke>
+    <invoke partnerLink="DroneFleetController">
+      <service name="dronefleetcontroller:dronefleetcontrollerService" port="DroneFleetControllerPort"/>
+    </invoke>
+  </process>
+  <process name="it.univaq.inicipict.mid1.sia:InvocationAddressService">
+    <process-events generate="all"/>
+    <provide partnerLink="SIAService">
+      <service name="it.univaq.inicipict.mid1.sia:cdShmSetInvocationAddressService" port="SetInvocationAddressServicePort"/>
+    </provide>
+  </process>
+</deploy>

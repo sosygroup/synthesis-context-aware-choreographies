@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/sae"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="sae"
+	targetNamespace="http://it.univaq.incipict.ems/sae">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/sae">
+    	<xsd:element name="signalEventRequest" type="tns:earlyWarning"/>
+
+		<xsd:complexType name="earlyWarning">
+			<xsd:sequence>
+				<xsd:element name="eventCode" type="xsd:string"/>
+				<xsd:element name="timestamp" type="xsd:dateTime"/>
+				<xsd:element name="predictedMagnitude" type="xsd:float"/>
+				<xsd:element name="sensorID" type="xsd:string"/>
+				<xsd:element name="coordinates" type="tns:coordinates">
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="coordinates">
+			<xsd:sequence>
+				<xsd:element name="latitude" type="xsd:float"/>
+				<xsd:element name="longitude" type="xsd:float"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="signalEventRequest">
+    <wsdl:part element="tns:signalEventRequest" name="request"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="saePT">
+    <wsdl:operation name="SignalEvent">
+      <wsdl:input message="tns:signalEventRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="saeBinding" type="tns:saePT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="SignalEvent">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="saeService">
+    <wsdl:port binding="tns:saeBinding" name="saePort">
+      <soap:address location="http://localhost:8080/sae/sae"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

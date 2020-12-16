@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:bsa="http://it.univaq.incipict.ems/bsa" xmlns:buildingautomation="http://it.univaq.incipict.ems/buildingautomation" xmlns:cdBsa="http://it.univaq.incipict.ems/cdBsa/" xmlns:cdBsa_1="http://it.univaq.incipict.ems/cdBsa" xmlns:energy="http://it.univaq.incipict.ems/energy" xmlns:it.univaq.inicipict.mid1.sia="http://it.univaq.inicipict.mid1.sia/">
+  <process name="cdBsa:cdBsaProcess.bpel">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="BsaClient">
+      <service name="cdBsa_1:cdBsaService" port="cdBsaPort"/>
+    </provide>
+    <invoke partnerLink="BsaProvider">
+      <service name="bsa:bsaConsumerService" port="bsaPort"/>
+    </invoke>
+    <invoke partnerLink="BsaConsumer">
+      <service name="bsa:bsaConsumerService" port="bsaConsumerPort"/>
+    </invoke>
+    <invoke partnerLink="Energy">
+      <service name="energy:energyService" port="energyPort"/>
+    </invoke>
+    <invoke partnerLink="BuildingAutomation">
+      <service name="buildingautomation:buildingautomationService" port="buildingautomationPort"/>
+    </invoke>
+  </process>
+  <process name="it.univaq.inicipict.mid1.sia:InvocationAddressService">
+    <process-events generate="all"/>
+    <provide partnerLink="SIAService">
+      <service name="it.univaq.inicipict.mid1.sia:cdBsaSetInvocationAddressService" port="SetInvocationAddressServicePort"/>
+    </provide>
+  </process>
+</deploy>

@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/sae"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="sae"
+	targetNamespace="http://it.univaq.incipict.ems/sae">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/sae">
+
+		<xsd:element name="signalEventRequest" type="tns:earlyWarning"/>
+    	<xsd:element name="getActivateAlarmMessageInput" type="tns:instanceInfo"/>
+    	<xsd:element name="activateAlarmRequest" type="tns:alarmInfo"/>
+    	<xsd:element name="getNotifyAlarmingMessageInput" type="tns:instanceInfo"/>
+    	<xsd:element name="notifyAlarmingRequest" type="tns:alarmInfo"/>
+    	<xsd:element name="getSendPlanMessageInput" type="tns:instanceInfo"/>
+    	<xsd:element name="sendPlanRequest" type="tns:alarmInfo"/>
+    	<xsd:element name="sendPlanResponse" type="tns:sendPlanResponse"/>
+    	<xsd:element name="getActivatePanelsMessageInput" type="tns:instanceInfo"/>
+    	<xsd:element name="activatePanelsRequest" type="tns:activationRequest"/>
+    	<xsd:element name="emptyResponse" type="tns:emptyResponse"/>
+
+		<xsd:complexType name="earlyWarning">
+			<xsd:sequence>
+				<xsd:element name="eventCode" type="xsd:string"/>
+				<xsd:element name="timestamp" type="xsd:dateTime"/>
+				<xsd:element name="predictedMagnitude" type="xsd:float"/>
+				<xsd:element name="sensorID" type="xsd:string"/>
+				<xsd:element name="coordinates" type="tns:coordinates">
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="coordinates">
+			<xsd:sequence>
+				<xsd:element name="latitude" type="xsd:float"/>
+				<xsd:element name="longitude" type="xsd:float"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+        <xsd:complexType name="alarmInfo">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="timestamp" type="xsd:dateTime" />
+		      <xsd:element name="emergencyType" type="tns:emergencyType" />
+		      <xsd:element name="areaCode" type="xsd:string" maxOccurs="unbounded" />
+		    </xsd:sequence>
+	  	</xsd:complexType>
+
+		<xsd:complexType name="sendPlanResponse">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="evacuationId" type="xsd:string"/>
+		    </xsd:sequence>
+	  	</xsd:complexType>
+
+		<xsd:complexType name="activationRequest">
+			<xsd:sequence>
+				<xsd:element name="alarmCode" type="xsd:string" />
+				<xsd:element name="evacuationId" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:simpleType name="emergencyType">
+		    <xsd:restriction base="xsd:string">
+		      <xsd:enumeration value="earthquake" />
+		      <xsd:enumeration value="fire" />
+		      <xsd:enumeration value="generalemergency" />
+		    </xsd:restriction>
+	  	</xsd:simpleType>
+
+		<xsd:complexType name="instanceInfo">
+			<xsd:sequence>
+				<xsd:element name="instanceId" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="emptyResponse">
+			<xsd:sequence/>
+		</xsd:complexType>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="signalEventRequest">
+    <wsdl:part element="tns:signalEventRequest" name="message"/>
+  </wsdl:message>
+  <wsdl:message name="getActivateAlarmMessageInput">
+  	<wsdl:part element="tns:getActivateAlarmMessageInput" name="request"/>
+  </wsdl:message> 
+  <wsdl:message name="activateAlarmRequest">
+    <wsdl:part element="tns:activateAlarmRequest" name="response"/>
+  </wsdl:message>
+ <wsdl:message name="getNotifyAlarmingMessageInput">
+    <wsdl:part element="tns:getNotifyAlarmingMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="notifyAlarmingRequest">
+    <wsdl:part element="tns:notifyAlarmingRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getSendPlanMessageInput">
+    <wsdl:part element="tns:getSendPlanMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="sendPlanRequest">
+    <wsdl:part element="tns:sendPlanRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="sendPlanResponse">
+    <wsdl:part element="tns:sendPlanResponse" name="message"/>
+  </wsdl:message>
+  <wsdl:message name="getActivatePanelsMessageInput">
+  	<wsdl:part element="tns:getActivatePanelsMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="activatePanelsRequest">
+  	<wsdl:part element="tns:activatePanelsRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="emptyResponse">
+  	<wsdl:part element="tns:emptyResponse" name="response"/>
+  </wsdl:message>
+ 
+  <!-- Provider part -->
+  <wsdl:portType name="saePT">
+    <wsdl:operation name="SignalEvent">
+      <wsdl:input message="tns:signalEventRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="saeBinding" type="tns:saePT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="SignalEvent">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <!-- Consumer part -->
+  <wsdl:portType name="saeConsumerPT">
+  	<wsdl:operation name="storeSignalEventRequest">
+  	  <wsdl:input message="tns:signalEventRequest"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+    <wsdl:operation name="getActivateAlarmMessage">
+   	  <wsdl:input message="tns:getActivateAlarmMessageInput"/>
+      <wsdl:output message="tns:activateAlarmRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="getNotifyAlarmingMessage">
+      <wsdl:input message="tns:getNotifyAlarmingMessageInput"/>
+      <wsdl:output message="tns:notifyAlarmingRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="getSendPlanMessage">
+      <wsdl:input message="tns:getSendPlanMessageInput"/>
+      <wsdl:output message="tns:sendPlanRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="storeSendPlanResponse">
+      <wsdl:input message="tns:sendPlanResponse"/>
+      <wsdl:output message="tns:emptyResponse"/>
+    </wsdl:operation>
+    <wsdl:operation name="getActivatePanelsMessage">
+      <wsdl:input message="tns:getActivatePanelsMessageInput"/>
+   	  <wsdl:output message="tns:activatePanelsRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="saeConsumerBinding" type="tns:saeConsumerPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="storeSignalEventRequest">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getActivateAlarmMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getNotifyAlarmingMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSendPlanMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="storeSendPlanResponse">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getActivatePanelsMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="saeService">
+    <!-- Provider part binding -->
+  	<wsdl:port binding="tns:saeBinding" name="saePort">
+      <soap:address location="http://localhost:9080/sae/sae"/>
+    </wsdl:port>
+    <!-- Consumer part binding -->
+    <wsdl:port binding="tns:saeConsumerBinding" name="saeConsumerPort">
+      <soap:address location="http://localhost:9080/sae/consumer"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

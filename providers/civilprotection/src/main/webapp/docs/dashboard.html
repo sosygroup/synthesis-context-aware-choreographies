@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>Civil Protection - Dashboard</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  	<script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js" integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==" crossorigin=""></script>
+  	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
+  	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+
+</head>
+<body>
+	<div class="row m-0 bg-light">
+		<div id="container-map" class="col-md-8 px-0">
+			<div id="mapid" style="height: 100vh;"></div>
+		</div>
+		<div id="container-list" class="col-md-4" style="height: 100vh; overflow:scroll;">
+			
+		</div>
+	</div>
+
+  	<script>
+		var mymap = L.map('mapid').setView([42.35029, 13.400066], 15);
+		
+		L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+				'<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+				'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+			id: 'mapbox/streets-v11'
+		}).addTo(mymap);
+	
+	    var MapIcon = L.Icon.extend({
+	      options: {
+	          iconSize:     [20, 20],
+	          popupAnchor:  [0, -10]
+	      }
+	    });
+	
+	    var greenIcon = new MapIcon({iconUrl: 'icons/green.png'}),
+	      yellowIcon = new MapIcon({iconUrl: 'icons/yellow.png'}),
+	      redIcon = new MapIcon({iconUrl: 'icons/red.png'});
+	
+	    function buildContent(interventionPlan) {
+	  	  interventionPlan["highestPriority"].forEach(function(place) {
+		  		  addMapMarker(place, redIcon);
+		  		  buildReport(place, "High");
+	  		  });
+	  	  interventionPlan["mediumPriority"].forEach(function(place) {
+	  			addMapMarker(place, yellowIcon);
+	  		  	buildReport(place, "Medium");
+	  		  });
+	  	  interventionPlan["lowestPriority"].forEach(function(place) {
+	  			addMapMarker(place, greenIcon);
+	  		  	buildReport(place, "Low");
+  		  	  });
+	    }
+
+	    var markers = [];
+
+	    function addMapMarker(place, icon) {
+	  	  markers[place["buildingId"]] = L.marker([place["lat"], place["lon"]], {icon: icon}).addTo(mymap).bindPopup("<b>"+place["name"]+"</b><br/>Status: "+place["status"]+"<br/>People: "+place["peopleCounted"]+"<br/>");
+	    }
+
+	    function buildReport(place, priority) {
+	    	var $card = $('<div class="card my-3 shadow-sm">\
+			    			<div class="card-body">\
+			          			<h5 class="card-title">Place name</h5>\
+			          			<p class="card-text">Place content</p>\
+		        			</div>\
+			      		</div>');
+      		$card.find(".card-title").html(place["name"]);
+      		$card.find(".card-text").html("Status: "+place["status"]+"<br/>People: "+place["peopleCounted"]);
+
+			switch (priority) {
+			case "High":
+				$card.addClass("alert-danger");
+				break;
+			case "Medium":
+				$card.addClass("alert-warning");
+				break;
+			case "Low":
+				break;
+			}
+
+			$card.bind("click", function(){
+				markers[place["buildingId"]].openPopup();
+			});
+	    	$("#container-list").append($card);
+	    }
+	
+	    $(document).ready(function() {
+	      $.ajax({
+	          url: "http://localhost:9080/civilprotection/api/interventionPlan",
+	          dataType: 'json',
+	          accepts: "application/json; charset=utf-8",
+	          crossDomain:    true,
+	          success: function(response) {
+	            console.log(response);
+	            buildContent(response);
+	          }
+	      });
+	    });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	name="propertiesAliases"
+	targetNamespace="http://it.univaq.incipict.ems/propertiesAliases"
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:properties="http://it.univaq.incipict.ems/properties"
+	xmlns:cdbsa="http://it.univaq.incipict.ems/cdBsa"
+	xmlns:bsa="http://it.univaq.incipict.ems/bsa">
+
+  <import location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+  <import location="bsa.wsdl" namespace="http://it.univaq.incipict.ems/bsa"/>
+
+  <vprop:propertyAlias messageType="cdbsa:notifyAlarmingRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdbsa:secureBuildingsRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="bsa:getSignalStopElevatorsMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="bsa:getShutdownPlantsMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdbsa:prepareRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>/</vprop:query>
+  </vprop:propertyAlias>
+
+</definitions>

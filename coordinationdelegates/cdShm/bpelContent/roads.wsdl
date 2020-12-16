@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/roads"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="roads"
+	targetNamespace="http://it.univaq.incipict.ems/roads">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/roads">
+    	<xsd:element name="closeRoadsRequest" type="tns:closeRoadsList"></xsd:element>
+
+		<xsd:complexType name="closeRoadsList">
+			<xsd:sequence>
+				<xsd:element name="alarmCode" type="xsd:string"/>
+				<xsd:element name="road" type="tns:road" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="road">
+			<xsd:sequence>
+				<xsd:element name="roadCode" type="xsd:string" />
+				<xsd:element name="from" type="xsd:double" />
+				<xsd:element name="to" type="xsd:double" />
+			</xsd:sequence>
+		</xsd:complexType>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="closeRoadsRequest">
+    <wsdl:part element="tns:closeRoadsRequest" name="request"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="roadsPT">
+    <wsdl:operation name="CloseRoads">
+      <wsdl:input message="tns:closeRoadsRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="roadsBinding" type="tns:roadsPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="CloseRoads">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="roadsService">
+    <wsdl:port binding="tns:roadsBinding" name="roadsPort">
+      <soap:address location="http://localhost:9080/roads/roads"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

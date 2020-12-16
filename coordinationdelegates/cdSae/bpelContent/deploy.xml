@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:cdBsa="http://it.univaq.incipict.ems/cdBsa" xmlns:cdSae="http://it.univaq.incipict.ems/cdSae/" xmlns:cdSae_1="http://it.univaq.incipict.ems/cdSae" xmlns:cdShm="http://it.univaq.incipict.ems/cdShm" xmlns:cityalarming="http://it.univaq.incipict.ems/cityalarming" xmlns:it.univaq.inicipict.mid1.sia="http://it.univaq.inicipict.mid1.sia/" xmlns:sae="http://it.univaq.incipict.ems/sae" xmlns:smartevacuation="http://it.univaq.incipict.ems/smartevacuation">
+  <process name="cdSae:cdSaeProcess.bpel">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="SaeClient">
+      <service name="cdSae_1:cdSaeService" port="cdSaePort"/>
+    </provide>
+    <provide partnerLink="SaeClientCoordination">
+      <service name="cdSae_1:cdSaeService" port="cdSaeCoordinationPort"/>
+    </provide>
+    <invoke partnerLink="SaeProvider">
+      <service name="sae:saeService" port="saePort"/>
+    </invoke>
+    <invoke partnerLink="SaeConsumer">
+      <service name="sae:saeService" port="saeConsumerPort"/>
+    </invoke>
+    <invoke partnerLink="Bsa">
+      <service name="cdBsa:cdBsaService" port="cdBsaPort"/>
+    </invoke>
+    <invoke partnerLink="CityAlarming">
+      <service name="cityalarming:cityalarmingService" port="cityalarmingPort"/>
+    </invoke>
+    <invoke partnerLink="SmartEvacuation">
+      <service name="smartevacuation:smartevacuationService" port="smartevacuationPort"/>
+    </invoke>
+    <invoke partnerLink="cdShmCoordination">
+      <service name="cdShm:cdShmService" port="cdShmCoordinationPort"/>
+    </invoke>
+  </process>
+  <process name="it.univaq.inicipict.mid1.sia:InvocationAddressService">
+    <process-events generate="all"/>
+    <provide partnerLink="SIAService">
+      <service name="it.univaq.inicipict.mid1.sia:cdSaeSetInvocationAddressService" port="SetInvocationAddressServicePort"/>
+    </provide>
+  </process>
+</deploy>

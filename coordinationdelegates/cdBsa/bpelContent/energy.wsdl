@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/energy"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="energy"
+	targetNamespace="http://it.univaq.incipict.ems/energy">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/energy">
+		<xsd:element name="shutdownPlantsRequest" type="tns:buildingList"/>
+
+		<xsd:complexType name="buildingList">
+			<xsd:sequence>
+				<xsd:element name="alarmCode" type="xsd:string"/>
+				<xsd:element name="buildingCode" type="xsd:string" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="shutdownPlantsRequest">
+    <wsdl:part element="tns:shutdownPlantsRequest" name="request"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="energyPT">
+    <wsdl:operation name="ShutdownPlants">
+      <wsdl:input message="tns:shutdownPlantsRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="energyBinding" type="tns:energyPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="ShutdownPlants">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="energyService">
+    <wsdl:port binding="tns:energyBinding" name="energyPort">
+      <soap:address location="http://localhost:9080/energy/energy"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

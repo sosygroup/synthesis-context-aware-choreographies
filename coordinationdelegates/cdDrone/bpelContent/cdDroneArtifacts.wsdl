@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions
+	targetNamespace="http://it.univaq.incipict.ems/cdDrone/Artifacts"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:client="http://it.univaq.incipict.ems/cdDrone"
+	xmlns:shm="http://it.univaq.incipict.ems/cdShm">
+  
+  <partnerLinkType name="ClientPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Client" portType="client:cdDronePT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="ShmPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Shm" portType="shm:cdShmPT"/>
+  </partnerLinkType>
+
+  <import location="cdDrone.wsdl" namespace="http://it.univaq.incipict.ems/cdDrone"/>
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+
+</definitions>

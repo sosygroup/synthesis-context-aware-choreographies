@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/sensornetwork"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="sensornetwork"
+	targetNamespace="http://it.univaq.incipict.ems/sensornetwork">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/sensornetwork">
+    	<xsd:element name="getBuildingDataRequest" type="tns:getBuildingDataRequest"/>
+    	<xsd:element name="getBuildingDataResponse" type="tns:rawBuildingDataResponse"/>
+
+		<xsd:complexType name="getBuildingDataRequest">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="areaCode" type="xsd:string" maxOccurs="unbounded" />
+		    </xsd:sequence>
+		</xsd:complexType>
+
+		  <xsd:complexType name="rawBuildingDataResponse">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="buildingData" type="tns:rawBuildingData" maxOccurs="unbounded" />
+		    </xsd:sequence>
+		  </xsd:complexType>
+		
+		  <xsd:complexType name="rawBuildingData">
+		    <xsd:sequence>
+		      <xsd:element name="buildingID" type="xsd:string" />
+		      <xsd:element name="sensorData" type="tns:sensorData" maxOccurs="unbounded"/>
+		    </xsd:sequence>
+		  </xsd:complexType>
+		
+		  <xsd:complexType name="sensorData">
+		    <xsd:sequence>
+		      <xsd:element name="sensorID" type="xsd:string" />
+		      <xsd:element name="timestamp" type="xsd:dateTime" />
+		      <xsd:element name="x" type="xsd:double" />
+		      <xsd:element name="y" type="xsd:double" />
+		      <xsd:element name="z" type="xsd:double" />
+		    </xsd:sequence>
+		  </xsd:complexType>
+		  
+	</xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="getBuildingDataRequest">
+    <wsdl:part element="tns:getBuildingDataRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getBuildingDataResponse">
+  	<wsdl:part element="tns:getBuildingDataResponse" name="response"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="SensorNetworkPT">
+    <wsdl:operation name="GetBuildingData">
+      <wsdl:input message="tns:getBuildingDataRequest"/>
+      <wsdl:output message="tns:getBuildingDataResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="SensorNetworkBinding" type="tns:SensorNetworkPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetBuildingData">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="sensornetworkService">
+    <wsdl:port binding="tns:SensorNetworkBinding" name="SensorNetworkPort">
+      <soap:address location="http://localhost:9080/sensornetwork/sensornetwork"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions
+	targetNamespace="http://it.univaq.incipict.ems/cdSae/Artifacts"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:client="http://it.univaq.incipict.ems/cdSae"
+	xmlns:sae="http://it.univaq.incipict.ems/sae"
+	xmlns:bsa="http://it.univaq.incipict.ems/cdBsa"
+	xmlns:cityalarming="http://it.univaq.incipict.ems/cityalarming"
+	xmlns:smartevacuation="http://it.univaq.incipict.ems/smartevacuation"
+	xmlns:cdshm="http://it.univaq.incipict.ems/cdShm">
+  
+  <partnerLinkType name="ClientPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Client" portType="client:cdSaePT"/>
+  </partnerLinkType> 
+  
+  <partnerLinkType name="SaePLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Sae" portType="sae:saePT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="SaeConsumerPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="SaeConsumer" portType="sae:saeConsumerPT"/>
+  </partnerLinkType>
+  
+  <partnerLinkType name="BsaPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Bsa" portType="bsa:cdBsaPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="CityAlarmingPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="CityAlarming" portType="cityalarming:cityalarmingPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="SmartEvacuationPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="SmartEvacuation" portType="smartevacuation:smartevacuationPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="ClientCoordinationPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Client" portType="client:cdSaeCoordinationPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="cdShmCoordinationPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="cdShm" portType="cdshm:cdShmCoordinationPT"/>
+  </partnerLinkType>
+
+  <import location="sae.wsdl" namespace="http://it.univaq.incipict.ems/sae"/>
+  <import location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+  <import location="cityalarming.wsdl" namespace="http://it.univaq.incipict.ems/cityalarming"/>
+  <import location="smartevacuation.wsdl" namespace="http://it.univaq.incipict.ems/smartevacuation"/>
+  <import location="cdSae.wsdl" namespace="http://it.univaq.incipict.ems/cdSae"/>
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+</definitions>

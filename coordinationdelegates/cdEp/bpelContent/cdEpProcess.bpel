@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes" name="cdEpProcess.bpel"
+    targetNamespace="http://it.univaq.incipict.ems/cdEp/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://it.univaq.incipict.ems/cdEp/Artifacts"
+    xmlns:client="http://it.univaq.incipict.ems/cdEp"
+	xmlns:ep="http://it.univaq.incipict.ems/ep"
+	xmlns:crowding="http://it.univaq.incipict.ems/crowding"
+	xmlns:civilprotection="http://it.univaq.incipict.ems/civilprotection"
+	xmlns:properties="http://it.univaq.incipict.ems/properties">
+
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdEpArtifacts.wsdl" namespace="http://it.univaq.incipict.ems/cdEp/Artifacts"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="ep.wsdl" namespace="http://it.univaq.incipict.ems/ep"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="crowding.wsdl" namespace="http://it.univaq.incipict.ems/crowding"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="civilprotection.wsdl" namespace="http://it.univaq.incipict.ems/civilprotection"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="propertiesAliases.wsdl" namespace="http://it.univaq.incipict.ems/propertiesAliases"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="properties.wsdl" namespace="http://it.univaq.incipict.ems/properties"/>
+
+    <bpel:partnerLinks>
+        <bpel:partnerLink name="EpClient" myRole="Client" partnerLinkType="ns:ClientPLT"/>
+        <bpel:partnerLink name="EpProvider" partnerRole="Ep" partnerLinkType="ns:EpPLT"/>
+        <bpel:partnerLink name="EpConsumer" partnerRole="EpConsumer" partnerLinkType="ns:EpConsumerPLT"/>
+        <bpel:partnerLink name="Crowding" partnerRole="Crowding" partnerLinkType="ns:CrowdingPLT"/>
+        <bpel:partnerLink name="CivilProtection" partnerRole="CivilProtection" partnerLinkType="ns:CivilProtectionPLT"/>
+    </bpel:partnerLinks>
+
+    <bpel:variables>
+        <bpel:variable messageType="client:buildingDataRequest" name="receiveBuildingDataRequest"/>
+        <bpel:variable messageType="ep:buildingDataRequest" name="forwardBuildingDataRequest"/>
+
+		<bpel:variable messageType="ep:getCrowdingDataMessageInput" name="getCrowdingDataMessageInput"/>
+        <bpel:variable messageType="ep:crowdingDataRequest" name="receiveCrowdingDataRequest"/>
+        <bpel:variable messageType="crowding:crowdingDataRequest" name="forwardCrowdingDataRequest"/>
+        <bpel:variable messageType="crowding:crowdingDataResponse" name="receiveCrowdingDataResponse"/>
+        <bpel:variable messageType="ep:crowdingDataResponse" name="forwardCrowdingDataResponse"/>
+
+        <bpel:variable messageType="ep:getSendInterventionPlanMessageInput" name="getSendInterventionPlanMessageInput"/>
+        <bpel:variable messageType="ep:interventionPlanRequest" name="receiveInterventionPlanRequest"/>
+        <bpel:variable messageType="civilprotection:interventionPlanRequest" name="forwardInterventionPlanRequest"/>
+
+		<bpel:variable messageType="client:updateBuildingDataRequest" name="receiveUpdateBuildingDataRequest"/>
+   		<bpel:variable messageType="ep:updateBuildingDataRequest" name="forwardUpdateBuildingDataRequest"/>
+
+        <bpel:variable messageType="ep:getUpdateInterventionPlanMessageInput" name="getUpdateInterventionPlanMessageInput"/>
+        <bpel:variable messageType="ep:interventionPlanUpdateRequest" name="receiveUpdateInterventionPlanRequest"/>
+        <bpel:variable messageType="civilprotection:interventionPlanUpdateRequest" name="forwardUpdateInterventionPlanRequest"/>
+
+		<bpel:variable messageType="client:missingDataAcknowledgementRequest" name="receiveMissingDataAcknowledgementRequest"/>
+   		<bpel:variable messageType="ep:missingDataAcknowledgementRequest" name="forwardMissingDataAcknowledgementRequest"/>
+
+        <bpel:variable messageType="ep:getSendNotificationMessageInput" name="getSendNotificationMessageInput"/>
+        <bpel:variable messageType="ep:sendNotificationRequest" name="receiveSendNotificationRequest"/>
+        <bpel:variable messageType="civilprotection:notificationRequest" name="forwardNotificationRequest"/>
+
+		<bpel:variable messageType="client:executeVariationRequest" name="executeVariationRequest"/>
+		<bpel:variable type="xsd:string" name="selectedVariant"/>
+
+		<bpel:variable messageType="ep:emptyResponse" name="emptyResponse"/>
+
+		<bpel:variable messageType="client:prepareRequest" name="prepareRequest"/>
+
+		<bpel:variable name="myName" type="xsd:string"/>
+		<bpel:variable name="EpProviderName" type="xsd:string"/>
+		<bpel:variable name="EpProviderAddress" type="xsd:string"/>
+		<bpel:variable name="EpConsumerName" type="xsd:string"/>
+		<bpel:variable name="EpConsumerAddress" type="xsd:string"/>
+		<bpel:variable name="CivilProtectionName" type="xsd:string"/>
+		<bpel:variable name="CivilProtectionAddress" type="xsd:string"/>
+		<bpel:variable name="CrowdingName" type="xsd:string"/>
+		<bpel:variable name="CrowdingAddress" type="xsd:string"/>
+    </bpel:variables>
+
+	<bpel:correlationSets>
+		<bpel:correlationSet
+			name="CorrelationSetInstanceID" properties="properties:instanceID" />
+	</bpel:correlationSets>
+
+    <bpel:sequence name="MainSequence">
+
+		<bpel:receive createInstance="yes" operation="Prepare"
+    		partnerLink="EpClient" portType="client:cdEpPT"
+    		variable="prepareRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+		<!-- Instancing name and address variables -->
+		<!-- Client -->
+		<bpel:assign name="assign_myName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdEp</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="myName"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Ep Provider -->
+        <bpel:assign name="assign_EpProviderName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>EpProvider</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="EpProviderName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_EpProviderAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="EpProvider"/>
+            <bpel:to variable="EpProviderAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_EpProviderAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $EpProviderName, $EpProviderAddress)]]></bpel:from>
+            <bpel:to partnerLink="EpProvider"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Ep Consumer -->
+        <bpel:assign name="assign_EpConsumerName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>EpConsumer</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="EpConsumerName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_EpConsumerAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="EpConsumer"/>
+            <bpel:to variable="EpConsumerAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_EpConsumerAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $EpConsumerName, $EpConsumerAddress)]]></bpel:from>
+            <bpel:to partnerLink="EpConsumer"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- CivilProtection -->
+        <bpel:assign name="assign_CivilProtectionName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>CivilProtection</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="CivilProtectionName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_CivilProtectionAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="CivilProtection"/>
+            <bpel:to variable="CivilProtectionAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_CivilProtectionAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $CivilProtectionName, $CivilProtectionAddress)]]></bpel:from>
+            <bpel:to partnerLink="CivilProtection"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Crowding -->
+        <bpel:assign name="assign_CrowdingName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>Crowding</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="CrowdingName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_CrowdingAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="Crowding"/>
+            <bpel:to variable="CrowdingAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_CrowdingAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $CrowdingName, $CrowdingAddress)]]></bpel:from>
+            <bpel:to partnerLink="Crowding"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<bpel:flow>
+			<bpel:sequence>
+
+				<bpel:receive
+					createInstance="no"
+					name="receive_sendBuildingData"
+					operation="SendBuildingData"
+		    		partnerLink="EpClient" portType="client:cdEpPT"
+		    		variable="receiveBuildingDataRequest">
+		    		<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+		   		</bpel:receive>
+		
+		 		<bpel:assign name="assign_forwardBuildingDataRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="receiveBuildingDataRequest" part="request" />
+						<bpel:to variable="forwardBuildingDataRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+		
+				<bpel:invoke
+					inputVariable="forwardBuildingDataRequest"
+					name="invoke_sendBuildingData"
+					operation="SendBuildingData"
+					partnerLink="EpProvider"/>
+		
+				<bpel:invoke
+					inputVariable="forwardBuildingDataRequest"
+					name="invoke_store_sendBuildingData"
+					operation="storeSendBuildingDataRequest"
+					partnerLink="EpConsumer"
+					outputVariable="emptyResponse">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+		
+				<!-- Invoke get crowding data to crowding:
+						1) get from ep consumer part
+						2) invoke service
+						3) store response -->
+				<bpel:assign name="assign_getCrowdingDataMessageInput" validate="no">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<tns:getCrowdingDataMessageInput
+										xmlns:tns="http://it.univaq.incipict.ems/sae"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+										<instanceId>Instance1</instanceId>
+								</tns:getCrowdingDataMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getCrowdingDataMessageInput" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+							<bpel:from property="properties:instanceID" variable="receiveBuildingDataRequest" part="request"/>
+							<bpel:to variable="getCrowdingDataMessageInput" part="request">
+								<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+									<![CDATA[instanceId]]>
+								</bpel:query>
+							</bpel:to>
+						</bpel:copy>
+				</bpel:assign>
+		
+				<bpel:invoke
+					inputVariable="getCrowdingDataMessageInput"
+					name="invoke_getGetCrowdingDataMessage"
+					operation="getGetCrowdingDataMessage"
+					partnerLink="EpConsumer"
+					outputVariable="receiveCrowdingDataRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+		
+				<bpel:assign name="assign_forwardCrowdingDataRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="receiveCrowdingDataRequest" part="response"/>
+						<bpel:to variable="forwardCrowdingDataRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+		
+				<bpel:invoke
+					inputVariable="forwardCrowdingDataRequest"
+					name="invoke_GetCrowdingData"
+					operation="GetCrowdingData"
+					partnerLink="Crowding"
+					outputVariable="receiveCrowdingDataResponse"/>
+		
+				<bpel:assign name="assign_forwardCrowdingDataResponse" validate="no">
+					<bpel:copy>
+						<bpel:from variable="receiveCrowdingDataResponse" part="response"/>
+						<bpel:to variable="forwardCrowdingDataResponse" part="message" />
+					</bpel:copy>
+				</bpel:assign>
+		
+				<bpel:invoke
+					inputVariable="forwardCrowdingDataResponse"
+					name="invoke_storeGetCrowdingDataResponse"
+					operation="storeGetCrowdingDataResponse"
+					partnerLink="EpConsumer"
+					outputVariable="emptyResponse"/>
+		
+				<!-- Invoke send intervention plan to civil protection:
+						1) get from ep consumer part
+						2) invoke service -->
+				<bpel:assign name="assign_getSendInterventionPlanMessageInput" validate="no">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<tns:getSendInterventionPlanMessageInput
+										xmlns:tns="http://it.univaq.incipict.ems/sae"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+										<instanceId>Instance1</instanceId>
+								</tns:getSendInterventionPlanMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getSendInterventionPlanMessageInput" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+							<bpel:from property="properties:instanceID" variable="receiveBuildingDataRequest" part="request"/>
+							<bpel:to variable="getSendInterventionPlanMessageInput" part="request">
+								<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+									<![CDATA[instanceId]]>
+								</bpel:query>
+							</bpel:to>
+						</bpel:copy>
+				</bpel:assign>
+		
+				<bpel:invoke
+					inputVariable="getSendInterventionPlanMessageInput"
+					name="invoke_getSendInterventionPlanMessage"
+					operation="getSendInterventionPlanMessage"
+					partnerLink="EpConsumer"
+					outputVariable="receiveInterventionPlanRequest">
+					<bpel:correlations>
+							<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+						</bpel:correlations>
+				</bpel:invoke>
+		
+				<bpel:assign name="assign_forwardInterventionPlanRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="receiveInterventionPlanRequest" part="response"/>
+						<bpel:to variable="forwardInterventionPlanRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+		
+				<bpel:invoke
+					inputVariable="forwardInterventionPlanRequest"
+					name="invoke_SendInterventionPlan"
+					operation="SendInterventionPlan"
+					partnerLink="CivilProtection"/>
+
+			</bpel:sequence>
+
+			<bpel:sequence>
+
+				<!-- Receive from eCD -->
+				<bpel:receive
+					createInstance="no"
+					name="receive_executeVariation"
+					operation="ExecuteVariation"
+					partnerLink="EpClient"
+					portType="client:cdEpPT"
+					variable="executeVariationRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+				</bpel:receive>
+		
+				<bpel:assign name="assign_selectedVariant" validate="no">
+					<bpel:copy>
+						<bpel:from variable="executeVariationRequest" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[name]]>
+							</bpel:query>
+						</bpel:from>
+						<bpel:to variable="selectedVariant"></bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:if>
+					<bpel:condition><![CDATA[$selectedVariant="v1" or $selectedVariant="v2"]]></bpel:condition>
+					<bpel:sequence>
+						<!-- Task: UpdateBuildingData -->
+						<bpel:receive
+							createInstance="no"
+							name="receive_updateBuildingData"
+							operation="UpdateBuildingData"
+				    		partnerLink="EpClient"
+				    		portType="client:cdEpPT"
+				    		variable="receiveUpdateBuildingDataRequest">
+				    		<bpel:correlations>
+								<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+							</bpel:correlations>
+				   		</bpel:receive>
+				
+				 		<bpel:assign name="assign_forwardUpdateBuildingDataRequest" validate="no">
+							<bpel:copy>
+								<bpel:from variable="receiveUpdateBuildingDataRequest" part="request" />
+								<bpel:to variable="forwardUpdateBuildingDataRequest" part="request" />
+							</bpel:copy>
+						</bpel:assign>
+				
+						<bpel:invoke
+							inputVariable="forwardUpdateBuildingDataRequest"
+							name="invoke_updateBuildingData"
+							operation="UpdateBuildingData"
+							partnerLink="EpProvider"/>
+				
+						<bpel:invoke
+							inputVariable="forwardUpdateBuildingDataRequest"
+							name="invoke_store_updateBuildingData"
+							operation="storeUpdateBuildingDataRequest"
+							partnerLink="EpConsumer"
+							outputVariable="emptyResponse">
+							<bpel:correlations>
+								<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+							</bpel:correlations>
+						</bpel:invoke>
+						<!-- Task: Update Building Data -->
+
+						<!--  Task: EP - UpdateInterventionPlan - Civil Protection -->
+						<bpel:assign name="assign_getUpdateInterventionPlanMessageInput" validate="no">
+							<bpel:copy>
+								<bpel:from>
+									<bpel:literal>
+										<tns:getUpdateInterventionPlanMessageInput
+												xmlns:tns="http://it.univaq.incipict.ems/sae"
+												xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+												<instanceId>Instance1</instanceId>
+										</tns:getUpdateInterventionPlanMessageInput>
+									</bpel:literal>
+								</bpel:from>
+								<bpel:to variable="getUpdateInterventionPlanMessageInput" part="request"/>
+							</bpel:copy>
+							<bpel:copy>
+									<bpel:from property="properties:instanceID" variable="receiveUpdateBuildingDataRequest" part="request"/>
+									<bpel:to variable="getUpdateInterventionPlanMessageInput" part="request">
+										<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+											<![CDATA[instanceId]]>
+										</bpel:query>
+									</bpel:to>
+								</bpel:copy>
+						</bpel:assign>
+				
+						<bpel:invoke
+							inputVariable="getUpdateInterventionPlanMessageInput"
+							name="invoke_getUpdateInterventionPlanMessage"
+							operation="getUpdateInterventionPlanMessage"
+							partnerLink="EpConsumer"
+							outputVariable="receiveUpdateInterventionPlanRequest">
+							<bpel:correlations>
+									<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+								</bpel:correlations>
+						</bpel:invoke>
+				
+						<bpel:assign name="assign_forwardUpdateInterventionPlanRequest" validate="no">
+							<bpel:copy>
+								<bpel:from variable="receiveUpdateInterventionPlanRequest" part="response"/>
+								<bpel:to variable="forwardUpdateInterventionPlanRequest" part="request" />
+							</bpel:copy>
+						</bpel:assign>
+				
+						<bpel:invoke
+							inputVariable="forwardUpdateInterventionPlanRequest"
+							name="invoke_UpdateInterventionPlan"
+							operation="UpdateInterventionPlan"
+							partnerLink="CivilProtection"/>
+					</bpel:sequence>
+					<bpel:elseif>
+						<bpel:condition><![CDATA[$selectedVariant="v3"]]></bpel:condition>
+						<bpel:sequence>
+							<!-- Task: SHM - SendMissingDataAcknowledgement - EP -->
+							<bpel:receive createInstance="no" operation="SendMissingDataAcknowledgement"
+					    		partnerLink="EpClient" portType="client:cdEpPT"
+					    		variable="receiveMissingDataAcknowledgementRequest">
+					    		<bpel:correlations>
+									<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+								</bpel:correlations>
+					   		</bpel:receive>
+					
+					 		<bpel:assign name="assign_forwardMissingDataAcknowledgementRequest" validate="no">
+								<bpel:copy>
+									<bpel:from variable="receiveMissingDataAcknowledgementRequest" part="request" />
+									<bpel:to variable="forwardMissingDataAcknowledgementRequest" part="request" />
+								</bpel:copy>
+							</bpel:assign>
+					
+							<bpel:invoke
+								inputVariable="forwardMissingDataAcknowledgementRequest"
+								name="invoke_sendMissingDataAcknowledgement"
+								operation="SendMissingDataAcknowledgement"
+								partnerLink="EpProvider"/>
+					
+							<bpel:invoke
+								inputVariable="forwardMissingDataAcknowledgementRequest"
+								name="invoke_store_sendMissingDataAcknowledgement"
+								operation="storeSendMissingDataAcknowledgementRequest"
+								partnerLink="EpConsumer"
+								outputVariable="emptyResponse">
+								<bpel:correlations>
+									<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+								</bpel:correlations>
+							</bpel:invoke>
+	
+							<!--  Task: EP - SendNotification - Civil Protection -->
+							<bpel:assign name="assign_getSendNotificationMessageInput" validate="no">
+								<bpel:copy>
+									<bpel:from>
+										<bpel:literal>
+											<tns:getSendNotificationMessageInput
+													xmlns:tns="http://it.univaq.incipict.ems/sae"
+													xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+													<instanceId>Instance1</instanceId>
+											</tns:getSendNotificationMessageInput>
+										</bpel:literal>
+									</bpel:from>
+									<bpel:to variable="getSendNotificationMessageInput" part="request"/>
+								</bpel:copy>
+								<bpel:copy>
+										<bpel:from property="properties:instanceID" variable="receiveMissingDataAcknowledgementRequest" part="request"/>
+										<bpel:to variable="getSendNotificationMessageInput" part="request">
+											<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+												<![CDATA[instanceId]]>
+											</bpel:query>
+										</bpel:to>
+									</bpel:copy>
+							</bpel:assign>
+					
+							<bpel:invoke
+								inputVariable="getSendNotificationMessageInput"
+								name="invoke_getSendNotificationMessage"
+								operation="getSendNotificationMessage"
+								partnerLink="EpConsumer"
+								outputVariable="receiveSendNotificationRequest">
+								<bpel:correlations>
+										<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+									</bpel:correlations>
+							</bpel:invoke>
+					
+							<bpel:assign name="assign_forwardNotificationRequest" validate="no">
+								<bpel:copy>
+									<bpel:from variable="receiveSendNotificationRequest" part="response"/>
+									<bpel:to variable="forwardNotificationRequest" part="request" />
+								</bpel:copy>
+							</bpel:assign>
+					
+							<bpel:invoke
+								inputVariable="forwardNotificationRequest"
+								name="invoke_SendNotification"
+								operation="SendNotification"
+								partnerLink="CivilProtection"/>
+						</bpel:sequence>
+					</bpel:elseif>
+				</bpel:if>
+			</bpel:sequence>
+		</bpel:flow>
+		<bpel:exit/>
+    </bpel:sequence>
+</bpel:process>

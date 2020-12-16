@@ -1,0 +1,1042 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes" name="cdShmProcess.bpel"
+    targetNamespace="http://it.univaq.incipict.ems/cdShm/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://it.univaq.incipict.ems/cdShm/Artifacts"
+    xmlns:client="http://it.univaq.incipict.ems/cdShm"
+    xmlns:ecd="http://it.univaq.incipict.ems/eCD"
+    xmlns:shm="http://it.univaq.incipict.ems/shm"
+    xmlns:bsa="http://it.univaq.incipict.ems/cdBsa"
+    xmlns:ep="http://it.univaq.incipict.ems/cdEp"
+	xmlns:roads="http://it.univaq.incipict.ems/roads"
+	xmlns:sensornetwork="http://it.univaq.incipict.ems/sensornetwork"
+	xmlns:dronefleetcontroller="http://it.univaq.incipict.ems/dronefleetcontroller"
+	xmlns:properties="http://it.univaq.incipict.ems/properties">
+
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdShmArtifacts.wsdl" namespace="http://it.univaq.incipict.ems/cdShm/Artifacts"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="eCD.wsdl" namespace="http://it.univaq.incipict.ems/eCD"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="shm.wsdl" namespace="http://it.univaq.incipict.ems/shm"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdEp.wsdl" namespace="http://it.univaq.incipict.ems/cdEp"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="roads.wsdl" namespace="http://it.univaq.incipict.ems/roads"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="sensornetwork.wsdl" namespace="http://it.univaq.incipict.ems/sensornetwork"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="dronefleetcontroller.wsdl" namespace="http://it.univaq.incipict.ems/dronefleetcontroller"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="propertiesAliases.wsdl" namespace="http://it.univaq.incipict.ems/propertiesAliases"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="properties.wsdl" namespace="http://it.univaq.incipict.ems/properties"/>
+
+    <bpel:partnerLinks>
+        <bpel:partnerLink name="ShmClient" myRole="Client" partnerLinkType="ns:ClientPLT"/>
+        <bpel:partnerLink name="eCD" partnerRole="eCD" partnerLinkType="ns:eCDPLT"/>
+        <bpel:partnerLink name="ShmProvider" partnerRole="Shm" partnerLinkType="ns:ShmPLT"/>
+        <bpel:partnerLink name="ShmConsumer" partnerRole="ShmConsumer" partnerLinkType="ns:ShmConsumerPLT"/>
+        <bpel:partnerLink name="Bsa" partnerRole="Bsa" partnerLinkType="ns:BsaPLT"/>
+        <bpel:partnerLink name="Ep" partnerRole="Ep" partnerLinkType="ns:EpPLT"/>
+        <bpel:partnerLink name="Roads" partnerRole="Roads" partnerLinkType="ns:RoadsPLT"/>
+        <bpel:partnerLink name="SensorNetwork" partnerRole="SensorNetwork" partnerLinkType="ns:SensorNetworkPLT"/>
+        <bpel:partnerLink name="DroneFleetController" partnerRole="DroneFleetController" partnerLinkType="ns:DroneFleetControllerPLT"/>
+        <bpel:partnerLink name="ShmClientCoordination" myRole="Client" partnerLinkType="ns:ClientCoordinationPLT"/>
+    </bpel:partnerLinks>
+
+    <bpel:variables>
+        <bpel:variable messageType="client:endEventRequest" name="receiveEndEventRequest"/>
+        <bpel:variable messageType="shm:endEventRequest" name="forwardEndEventRequest"/>
+
+        <bpel:variable messageType="shm:getBuildingDataMessageInput" name="getBuildingDataMessageInput"/>
+        <bpel:variable messageType="shm:getBuildingDataRequest" name="getBuildingDataRequest"/>
+        <bpel:variable messageType="sensornetwork:getBuildingDataRequest" name="forwardGetBuildingDataRequest"/>
+        <bpel:variable messageType="sensornetwork:getBuildingDataResponse" name="receiveGetBuildingDataResponse"/>
+        <bpel:variable messageType="shm:rawBuildingDataResponse" name="rawBuildingDataResponse"/>
+
+		<bpel:variable messageType="shm:getSendBuildingDataMessageInput" name="getSendBuildingDataMessageInput"/>
+        <bpel:variable messageType="shm:buildingDataRequest" name="buildingDataRequest"/>
+        <bpel:variable messageType="ep:buildingDataRequest" name="forwardBuildingDataRequest"/>
+
+		<bpel:variable messageType="shm:getSecureBuildingsMessageInput" name="getSecureBuildingsMessageInput"/>
+        <bpel:variable messageType="shm:secureBuildingsRequest" name="secureBuildingsRequest"/>
+        <bpel:variable messageType="bsa:secureBuildingsRequest" name="forwardSecureBuildingsRequest"/>
+
+		<bpel:variable messageType="shm:getCloseRoadsMessageInput" name="getCloseRoadsMessageInput"/>
+        <bpel:variable messageType="shm:closeRoadsRequest" name="closeRoadsRequest"/>
+        <bpel:variable messageType="roads:closeRoadsRequest" name="forwardCloseRoadsRequest"/>
+
+		<bpel:variable messageType="shm:getSendLiveFlightDetailsMessageInput" name="getSendLiveFlightDetailsMessageInput"/>
+        <bpel:variable messageType="shm:sendLiveFlightDetailsRequest" name="sendLiveFlightDetailsRequest"/>
+        <bpel:variable messageType="dronefleetcontroller:sendLiveFlightDetailsRequest" name="forwardSendLiveFlightDetailsRequest"/>
+
+		<bpel:variable messageType="client:livePhotogrammetryRequest" name="receiveLivePhotogrammetryRequest"/>
+   		<bpel:variable messageType="shm:livePhotogrammetryRequest" name="forwardLivePhotogrammetryRequest"/>
+
+		<bpel:variable messageType="shm:getSendSimpleFlightDetailsMessageInput" name="getSendSimpleFlightDetailsMessageInput"/>
+        <bpel:variable messageType="shm:sendSimpleFlightDetailsRequest" name="sendSimpleFlightDetailsRequest"/>
+        <bpel:variable messageType="dronefleetcontroller:sendSimpleFlightDetailsRequest" name="forwardSendSimpleFlightDetailsRequest"/>
+
+		<bpel:variable messageType="client:checkpointDescriptionRequest" name="receiveCheckpointDescriptionRequest"/>
+   		<bpel:variable messageType="shm:checkpointDescriptionRequest" name="forwardCheckpointDescriptionRequest"/>
+
+		<bpel:variable messageType="shm:getUpdateBuildingDataMessageInput" name="getUpdateBuildingDataMessageInput"/>
+        <bpel:variable messageType="shm:updateBuildingDataRequest" name="updateBuildingDataRequest"/>
+        <bpel:variable messageType="ep:updateBuildingDataRequest" name="forwardUpdateBuildingDataRequest"/>
+
+		<bpel:variable messageType="shm:getSendMissingDataAcknowledgementMessageInput" name="getSendMissingDataAcknowledgementMessageInput"/>
+        <bpel:variable messageType="shm:missingDataAcknowledgementRequest" name="missingDataAcknowledgementRequest"/>
+        <bpel:variable messageType="ep:missingDataAcknowledgementRequest" name="forwardMissingDataAcknowledgementRequest"/>
+
+		<bpel:variable messageType="ecd:executeChoreographyVPRequest" name="executeChoreographyVPRequest"/>
+		<bpel:variable messageType="client:executeVariationRequest" name="executeVariationRequest"/>
+		<bpel:variable messageType="client:coordinationRequest" name="clientCoordinationRequest"/>
+
+		<bpel:variable messageType="shm:emptyResponse" name="emptyResponse"/>
+
+		<bpel:variable messageType="client:prepareRequest" name="prepareRequest"/>
+
+		<bpel:variable type="xsd:string" name="selectedVariant"/>
+		<bpel:variable type="xsd:boolean" name="continue"/>
+
+		<bpel:variable name="myName" type="xsd:string"/>
+		<bpel:variable name="ShmProviderName" type="xsd:string"/>
+		<bpel:variable name="ShmProviderAddress" type="xsd:string"/>
+		<bpel:variable name="ShmConsumerName" type="xsd:string"/>
+		<bpel:variable name="ShmConsumerAddress" type="xsd:string"/>
+		<bpel:variable name="cdBsaName" type="xsd:string"/>
+		<bpel:variable name="cdBsaAddress" type="xsd:string"/>
+		<bpel:variable name="cdEpName" type="xsd:string"/>
+		<bpel:variable name="cdEpAddress" type="xsd:string"/>
+		<bpel:variable name="eCDName" type="xsd:string"/>
+		<bpel:variable name="eCDAddress" type="xsd:string"/>
+		<bpel:variable name="RoadsName" type="xsd:string"/>
+		<bpel:variable name="RoadsAddress" type="xsd:string"/>
+		<bpel:variable name="SensorNetworkName" type="xsd:string"/>
+		<bpel:variable name="SensorNetworkAddress" type="xsd:string"/>
+		<bpel:variable name="DroneFleetControllerName" type="xsd:string"/>
+		<bpel:variable name="DroneFleetControllerAddress" type="xsd:string"/>
+    </bpel:variables>
+
+	<bpel:correlationSets>
+		<bpel:correlationSet
+			name="CorrelationSetInstanceID" properties="properties:instanceID" />
+	</bpel:correlationSets>
+
+    <bpel:sequence name="MainSequence">
+
+
+		<bpel:receive createInstance="yes" operation="Prepare"
+    		partnerLink="ShmClient" portType="client:cdShmPT"
+    		variable="prepareRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+		<!-- Instancing name and address variables -->
+		<!-- Client -->
+		<bpel:assign name="assign_myName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdShm</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="myName"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Shm Provider -->
+        <bpel:assign name="assign_ShmProviderName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>ShmProvider</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="ShmProviderName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_ShmProviderAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="ShmProvider"/>
+            <bpel:to variable="ShmProviderAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_ShmProviderAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $ShmProviderName, $ShmProviderAddress)]]></bpel:from>
+            <bpel:to partnerLink="ShmProvider"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Shm Consumer -->
+        <bpel:assign name="assign_ShmConsumerName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>ShmConsumer</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="ShmConsumerName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_ShmConsumerAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="ShmConsumer"/>
+            <bpel:to variable="ShmConsumerAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_ShmConsumerAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $ShmConsumerName, $ShmConsumerAddress)]]></bpel:from>
+            <bpel:to partnerLink="ShmConsumer"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdBsa -->
+        <bpel:assign name="assign_cdBsaName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdBsa</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdBsaName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdBsaAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="Bsa"/>
+            <bpel:to variable="cdBsaAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdBsaAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdBsaName, $cdBsaAddress)]]></bpel:from>
+            <bpel:to partnerLink="Bsa"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdEp -->
+        <bpel:assign name="assign_cdEpName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdEp</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdEpName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdEpAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="Ep"/>
+            <bpel:to variable="cdEpAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdEpAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdEpName, $cdEpAddress)]]></bpel:from>
+            <bpel:to partnerLink="Ep"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- eCD -->
+        <bpel:assign name="assign_eCDName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>eCD</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="eCDName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_eCDAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="eCD"/>
+            <bpel:to variable="eCDAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_eCDAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $eCDName, $eCDAddress)]]></bpel:from>
+            <bpel:to partnerLink="eCD"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Roads -->
+        <bpel:assign name="assign_RoadsName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>Roads</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="RoadsName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_RoadsAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="Roads"/>
+            <bpel:to variable="RoadsAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_RoadsAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $RoadsName, $RoadsAddress)]]></bpel:from>
+            <bpel:to partnerLink="Roads"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- SensorNetwork -->
+        <bpel:assign name="assign_SensorNetworkName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>SensorNetwork</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="SensorNetworkName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_SensorNetworkAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="SensorNetwork"/>
+            <bpel:to variable="SensorNetworkAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_SensorNetworkAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $SensorNetworkName, $SensorNetworkAddress)]]></bpel:from>
+            <bpel:to partnerLink="SensorNetwork"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- DroneFleetController -->
+        <bpel:assign name="assign_DroneFleetControllerName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>DroneFleetController</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="DroneFleetControllerName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_DroneFleetControllerAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="DroneFleetController"/>
+            <bpel:to variable="DroneFleetControllerAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_DroneFleetControllerAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $DroneFleetControllerName, $DroneFleetControllerAddress)]]></bpel:from>
+            <bpel:to partnerLink="DroneFleetController"/>
+          </bpel:copy>
+        </bpel:assign>
+        <!-- /Instancing name and address variables -->
+
+        <bpel:receive
+        	createInstance="no"
+        	name="receive_signalEndEvent"
+        	operation="SignalEndEvent"
+    		partnerLink="ShmClient"
+    		portType="client:cdShmPT"
+    		variable="receiveEndEventRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+ 		<bpel:assign name="assign_forwardSignalEventRequest" validate="no">
+			<bpel:copy>
+				<bpel:from variable="receiveEndEventRequest" part="request" />
+				<bpel:to variable="forwardEndEventRequest" part="request" />
+			</bpel:copy>
+		</bpel:assign>
+
+		<!-- Invoke shm provider for signal end event send -->
+		<bpel:invoke
+			inputVariable="forwardEndEventRequest"
+			name="invoke_signalEndEvent"
+			operation="SignalEndEvent"
+			partnerLink="ShmProvider"/>
+
+		<!-- Invoke shm consumer for store signal end event (NOTE: Message type is the same than the provider) -->
+		<bpel:invoke
+			inputVariable="forwardEndEventRequest"
+			name="invoke_store_endEventRequest"
+			operation="storeEndEventRequest"
+			partnerLink="ShmConsumer"
+			outputVariable="emptyResponse"/>
+
+		<!-- Wait for coordination message from SAE -->
+		<bpel:receive
+			createInstance="no"
+			name="receive_synch"
+			operation="StepCoordinationPoint1"
+    		partnerLink="ShmClientCoordination"
+    		portType="client:cdShmCoordinationPT"
+    		variable="clientCoordinationRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+		<!-- Invoke requestBuildingData to sensor network:
+			1) get from shm consumer part
+			2) invoke service
+			3) store response -->
+		<bpel:assign name="assign_getBuildingDataMessageInput" validate="no">
+			<bpel:copy>
+				<bpel:from>
+					<bpel:literal>
+						<tns:getBuildingDataMessageInput
+								xmlns:tns="http://it.univaq.incipict.ems/shm"
+								xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+								<instanceId>InstanceID</instanceId>
+						</tns:getBuildingDataMessageInput>
+					</bpel:literal>
+				</bpel:from>
+				<bpel:to variable="getBuildingDataMessageInput" part="request"/>
+			</bpel:copy>
+			<bpel:copy>
+				<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+				<bpel:to variable="getBuildingDataMessageInput" part="request">
+					<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+						<![CDATA[instanceId]]>
+					</bpel:query>
+				</bpel:to>
+			</bpel:copy>
+		</bpel:assign>
+
+		<bpel:invoke
+			inputVariable="getBuildingDataMessageInput"
+			name="invoke_getGetBuildingDataMessage"
+			operation="getGetBuildingDataMessage"
+			partnerLink="ShmConsumer"
+			outputVariable="getBuildingDataRequest">
+			<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+			</bpel:correlations>
+		</bpel:invoke>
+
+		<bpel:assign name="assign_activateAlarmRequest" validate="no">
+			<bpel:copy>
+				<bpel:from variable="getBuildingDataRequest" part="response"/>
+				<bpel:to variable="forwardGetBuildingDataRequest" part="request" />
+			</bpel:copy>
+		</bpel:assign>
+
+		<bpel:invoke
+			inputVariable="forwardGetBuildingDataRequest"
+			name="invoke_GetBuildingData"
+			operation="GetBuildingData"
+			partnerLink="SensorNetwork"
+			outputVariable="receiveGetBuildingDataResponse"/>
+
+		<bpel:assign name="assign_rawBuildingDataResponse" validate="no">
+			<bpel:copy>
+				<bpel:from variable="receiveGetBuildingDataResponse" part="response"/>
+				<bpel:to variable="rawBuildingDataResponse" part="message" />
+			</bpel:copy>
+		</bpel:assign>
+
+		<bpel:invoke
+			inputVariable="rawBuildingDataResponse"
+			name="invoke_storeGetBuildingDataResponse"
+			operation="storeGetBuildingDataResponse"
+			partnerLink="ShmConsumer"
+			outputVariable="emptyResponse"/>
+
+		<bpel:flow>
+			
+			<bpel:sequence>
+				<!-- Invoke sendBuildingdata to ep:
+						1) get from shm consumer part
+						2) invoke service -->
+				<bpel:assign name="assign_getSendBuildingDataMessageInput">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<ns1:getSendBuildingDataMessageInput
+										xmlns:ns1="http://it.univaq.incipict.ems/shm"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+									<instanceId>InstanceID</instanceId>
+								</ns1:getSendBuildingDataMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getSendBuildingDataMessageInput" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+						<bpel:to variable="getSendBuildingDataMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="getSendBuildingDataMessageInput"
+					name="invoke_getSendBuildingDataMessage"
+					operation="getSendBuildingDataMessage"
+					partnerLink="ShmConsumer"
+					outputVariable="buildingDataRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_forwardBuildingDataRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="buildingDataRequest" part="response"/>
+						<bpel:to variable="forwardBuildingDataRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke 
+					inputVariable="forwardBuildingDataRequest"
+					name="invoke_SendBuildingData"
+					operation="SendBuildingData"
+					partnerLink="Ep">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+				</bpel:invoke>
+			</bpel:sequence>
+
+			<bpel:sequence>
+				<!-- Invoke secureBuildings to bsa:
+						1) get from shm consumer part
+						2) invoke service -->
+				<bpel:assign name="assign_getSecureBuildingsMessageInput">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<ns1:getSecureBuildingsMessageInput
+										xmlns:ns1="http://it.univaq.incipict.ems/shm"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+									<instanceId>InstanceID</instanceId>
+								</ns1:getSecureBuildingsMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getSecureBuildingsMessageInput" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+						<bpel:to variable="getSecureBuildingsMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="getSecureBuildingsMessageInput"
+					name="invoke_getSecureBuildingsMessage"
+					operation="getSecureBuildingsMessage"
+					partnerLink="ShmConsumer"
+					outputVariable="secureBuildingsRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_forwardSecureBuildingsRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="secureBuildingsRequest" part="response"/>
+						<bpel:to variable="forwardSecureBuildingsRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke 
+					inputVariable="forwardSecureBuildingsRequest"
+					name="invoke_SecureBuildings"
+					operation="SecureBuildings"
+					partnerLink="Bsa"/>
+			</bpel:sequence>
+
+			<bpel:sequence>
+				<!-- Invoke closeRoads to roads:
+						1) get from shm consumer part
+						2) invoke service -->
+				<bpel:assign name="assign_getCloseRoadsMessageInput">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<ns1:getCloseRoadsMessageInput
+										xmlns:ns1="http://it.univaq.incipict.ems/shm"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+									<instanceId>InstanceID</instanceId>
+								</ns1:getCloseRoadsMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getCloseRoadsMessageInput" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+						<bpel:to variable="getCloseRoadsMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="getCloseRoadsMessageInput"
+					name="invoke_getCloseRoadsMessage"
+					operation="getCloseRoadsMessage"
+					partnerLink="ShmConsumer"
+					outputVariable="closeRoadsRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_forwardCloseRoadsRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="closeRoadsRequest" part="response"/>
+						<bpel:to variable="forwardCloseRoadsRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke 
+					inputVariable="forwardCloseRoadsRequest"
+					name="invoke_CloseRoads"
+					operation="CloseRoads"
+					partnerLink="Roads"/>
+			</bpel:sequence>
+
+			<bpel:sequence>
+				<!-- Drone flow -->
+				<!-- CALL eCD -->
+				<bpel:assign name="assign_executeChoreographyVPRequest">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<ns1:executeChoreographyVPRequest
+										xmlns:ns1="http://it.univaq.incipict.ems/eCD"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+									<variationPoint>InterventionPlanning</variationPoint>
+									<instanceId>InstanceID</instanceId>
+								</ns1:executeChoreographyVPRequest>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="executeChoreographyVPRequest" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+						<bpel:to variable="executeChoreographyVPRequest" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+				
+				<bpel:invoke 
+					inputVariable="executeChoreographyVPRequest"
+					name="invoke_ExecuteChoreographyVP"
+					operation="ExecuteChoreographyVP"
+					partnerLink="eCD">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<!-- Receive from eCD -->
+				<bpel:receive
+					createInstance="no"
+					name="receive_executeVariation"
+					operation="ExecuteVariation"
+					partnerLink="ShmClient"
+					portType="client:cdShmPT"
+					variable="executeVariationRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+				</bpel:receive>
+		
+				<bpel:assign name="assign_selectedVariant" validate="no">
+					<bpel:copy>
+						<bpel:from variable="executeVariationRequest" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[name]]>
+							</bpel:query>
+						</bpel:from>
+						<bpel:to variable="selectedVariant"></bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:if>
+					<!-- Variant V1 -->
+					<bpel:condition><![CDATA[$selectedVariant="v1"]]></bpel:condition>
+					<bpel:sequence>
+						<!-- Task: SHM - Send live flight details - Drone Fleet Controller -->
+						<bpel:assign name="assign_getSendLiveFlightDetailsMessageInput" validate="no">
+							<bpel:copy>
+								<bpel:from>
+									<bpel:literal>
+										<tns:getSendLiveFlightDetailsMessageInput
+												xmlns:tns="http://it.univaq.incipict.ems/sae"
+												xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+												<instanceId>Instance1</instanceId>
+										</tns:getSendLiveFlightDetailsMessageInput>
+									</bpel:literal>
+								</bpel:from>
+								<bpel:to variable="getSendLiveFlightDetailsMessageInput" part="request"/>
+							</bpel:copy>
+							<bpel:copy>
+									<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+									<bpel:to variable="getSendLiveFlightDetailsMessageInput" part="request">
+										<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+											<![CDATA[instanceId]]>
+										</bpel:query>
+									</bpel:to>
+								</bpel:copy>
+						</bpel:assign>
+
+						<bpel:invoke
+							inputVariable="getSendLiveFlightDetailsMessageInput"
+							name="invoke_getSendLiveFlightDetailsMessage"
+							operation="getSendLiveFlightDetailsMessage"
+							partnerLink="ShmConsumer"
+							outputVariable="sendLiveFlightDetailsRequest">
+							<bpel:correlations>
+									<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+								</bpel:correlations>
+						</bpel:invoke>
+				
+						<bpel:assign name="assign_forwardSendLiveFlightDetailsRequest" validate="no">
+							<bpel:copy>
+								<bpel:from variable="sendLiveFlightDetailsRequest" part="response"/>
+								<bpel:to variable="forwardSendLiveFlightDetailsRequest" part="request" />
+							</bpel:copy>
+						</bpel:assign>
+				
+						<bpel:invoke
+							inputVariable="forwardSendLiveFlightDetailsRequest"
+							name="invoke_SendLiveFlightDetailsRequest"
+							operation="sendLiveFlightDetails"
+							partnerLink="DroneFleetController"/>
+
+						<!-- Loop Task: Live Photogrammetry Elaboration -->
+                        <bpel:repeatUntil name="repeatUntil_livePhotogrammetryElaboration">
+                        
+                        	<bpel:sequence>
+
+								<!-- Task: Drone Send Live Photogrammetry - SHM -->
+		                        <bpel:receive createInstance="no"
+		                        	name="receive_SendLivePhotogrametry"
+		                        	operation="SendLivePhotogrammetry"
+						    		partnerLink="ShmClient"
+						    		portType="client:cdShmPT"
+						    		variable="receiveLivePhotogrammetryRequest">
+						    		<bpel:correlations>
+										<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+									</bpel:correlations>
+						   		</bpel:receive>
+
+						 		<bpel:assign name="assign_forwardLivePhotogrammetryRequest" validate="no">
+									<bpel:copy>
+										<bpel:from variable="receiveLivePhotogrammetryRequest" part="request" />
+										<bpel:to variable="forwardLivePhotogrammetryRequest" part="request" />
+									</bpel:copy>
+								</bpel:assign>
+
+								<bpel:assign name="assign_continue" validate="no">
+									<bpel:copy>
+										<bpel:from variable="receiveLivePhotogrammetryRequest" part="request">
+											<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+												<![CDATA[continue]]>
+											</bpel:query>
+										</bpel:from>
+										<bpel:to variable="continue"></bpel:to>
+									</bpel:copy>
+								</bpel:assign>
+						
+								<bpel:invoke
+									inputVariable="forwardLivePhotogrammetryRequest"
+									name="invoke_sendLivePhotogrammetry"
+									operation="SendLivePhotogrammetry"
+									partnerLink="ShmProvider"/>
+						
+								<bpel:invoke
+									inputVariable="forwardLivePhotogrammetryRequest"
+									name="invoke_store_SendLivePhotogrammetry"
+									operation="storeLivePhotogrammetryRequest"
+									partnerLink="ShmConsumer"
+									outputVariable="emptyResponse">
+									<bpel:correlations>
+										<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+									</bpel:correlations>
+								</bpel:invoke>
+								<!-- /Task: Drone Send Live Photogrammetry - SHM -->
+		
+
+                        	</bpel:sequence>
+                        	<bpel:condition><![CDATA[not($continue)]]></bpel:condition>
+                        </bpel:repeatUntil>
+                        <!-- /Loop Task: Live Photogrammetry Elaboration -->
+
+						<!-- Task: SHM - Update Building Data - EP -->
+				   		<bpel:assign name="assign_getUpdateBuildingDataMessageInput" validate="no">
+							<bpel:copy>
+								<bpel:from>
+									<bpel:literal>
+										<tns:getUpdateBuildingDataMessageInput
+												xmlns:tns="http://it.univaq.incipict.ems/ep"
+												xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+												<instanceId>Instance1</instanceId>
+										</tns:getUpdateBuildingDataMessageInput>
+									</bpel:literal>
+								</bpel:from>
+								<bpel:to variable="getUpdateBuildingDataMessageInput" part="request"/>
+							</bpel:copy>
+							<bpel:copy>
+									<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+									<bpel:to variable="getUpdateBuildingDataMessageInput" part="request">
+										<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+											<![CDATA[instanceId]]>
+										</bpel:query>
+									</bpel:to>
+								</bpel:copy>
+						</bpel:assign>
+				
+						<bpel:invoke
+							inputVariable="getUpdateBuildingDataMessageInput"
+							name="invoke_getUpdateBuildingDataMessage"
+							operation="getUpdateBuildingDataMessage"
+							partnerLink="ShmConsumer"
+							outputVariable="updateBuildingDataRequest">
+							<bpel:correlations>
+									<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+								</bpel:correlations>
+						</bpel:invoke>
+				
+						<bpel:assign name="assign_forwardUpdateBuildingDataRequest" validate="no">
+							<bpel:copy>
+								<bpel:from variable="updateBuildingDataRequest" part="response"/>
+								<bpel:to variable="forwardUpdateBuildingDataRequest" part="request" />
+							</bpel:copy>
+						</bpel:assign>
+				
+						<bpel:invoke
+							inputVariable="forwardUpdateBuildingDataRequest"
+							name="invoke_updateBuildingData"
+							operation="UpdateBuildingData"
+							partnerLink="Ep"/>
+						<!-- /Task: SHM - Update Building Data - EP -->
+
+					</bpel:sequence>
+					<!-- /Variant V1 -->
+
+					<bpel:elseif>
+						<!-- Variant V2 -->
+						<bpel:condition><![CDATA[$selectedVariant="v2"]]></bpel:condition>
+						<bpel:sequence>
+							<!-- Task: Send Simple Fly Details -->
+							<bpel:assign name="assign_getSendLiveFlightDetailsMessageInput" validate="no">
+								<bpel:copy>
+									<bpel:from>
+										<bpel:literal>
+											<tns:getSendSimpleFlightDetailsMessageInput
+													xmlns:tns="http://it.univaq.incipict.ems/shm"
+													xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+													<instanceId>Instance1</instanceId>
+											</tns:getSendSimpleFlightDetailsMessageInput>
+										</bpel:literal>
+									</bpel:from>
+									<bpel:to variable="getSendSimpleFlightDetailsMessageInput" part="request"/>
+								</bpel:copy>
+								<bpel:copy>
+										<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+										<bpel:to variable="getSendSimpleFlightDetailsMessageInput" part="request">
+											<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+												<![CDATA[instanceId]]>
+											</bpel:query>
+										</bpel:to>
+									</bpel:copy>
+							</bpel:assign>
+					
+							<bpel:invoke
+								inputVariable="getSendSimpleFlightDetailsMessageInput"
+								name="invoke_getSendSimpleFlightDetailsMessage"
+								operation="getSendSimpleFlightDetailsMessage"
+								partnerLink="ShmConsumer"
+								outputVariable="sendSimpleFlightDetailsRequest">
+								<bpel:correlations>
+										<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+									</bpel:correlations>
+							</bpel:invoke>
+					
+							<bpel:assign name="assign_forwardSendSimpleFlightDetailsRequest" validate="no">
+								<bpel:copy>
+									<bpel:from variable="sendSimpleFlightDetailsRequest" part="response"/>
+									<bpel:to variable="forwardSendSimpleFlightDetailsRequest" part="request" />
+								</bpel:copy>
+							</bpel:assign>
+					
+							<bpel:invoke
+								inputVariable="forwardSendSimpleFlightDetailsRequest"
+								name="invoke_sendSimpleFlightDetailsRequest"
+								operation="sendSimpleFlightDetails"
+								partnerLink="DroneFleetController"/>
+							<!-- /Task: Send Simple Fly Details -->
+	
+							<!-- Loop Task: Checkpoint Description Elaboration -->
+                            <bpel:repeatUntil name="repeatUntil_checkpointDescriptionElaboration">
+
+                            	<bpel:sequence>                            	
+		                            <!-- Task: Send Checkpoint Description -->
+		                            <bpel:receive
+										createInstance="no"
+										name="receive_sendCheckpointDescription"
+										operation="SendCheckpointDescription"
+							    		partnerLink="ShmClient"
+							    		portType="client:cdShmPT"
+							    		variable="receiveCheckpointDescriptionRequest">
+							    		<bpel:correlations>
+											<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+										</bpel:correlations>
+							   		</bpel:receive>
+							
+							 		<bpel:assign name="assign_forwardCheckpointDescriptionRequest" validate="no">
+										<bpel:copy>
+											<bpel:from variable="receiveCheckpointDescriptionRequest" part="request" />
+											<bpel:to variable="forwardCheckpointDescriptionRequest" part="request" />
+										</bpel:copy>
+									</bpel:assign>
+
+									<bpel:assign name="assign_continue" validate="no">
+										<bpel:copy>
+											<bpel:from variable="receiveCheckpointDescriptionRequest" part="request">
+												<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+													<![CDATA[continue]]>
+												</bpel:query>
+											</bpel:from>
+											<bpel:to variable="continue"></bpel:to>
+										</bpel:copy>
+									</bpel:assign>
+							
+									<bpel:invoke
+										inputVariable="forwardCheckpointDescriptionRequest"
+										name="invoke_sendCheckpointDescription"
+										operation="SendCheckpointDescription"
+										partnerLink="ShmProvider"/>
+							
+									<bpel:invoke
+										inputVariable="forwardCheckpointDescriptionRequest"
+										name="invoke_store_CheckpointDescriptionRequest"
+										operation="storeCheckpointDescriptionRequest"
+										partnerLink="ShmConsumer"
+										outputVariable="emptyResponse">
+										<bpel:correlations>
+											<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+										</bpel:correlations>
+									</bpel:invoke>
+									<!-- \Task: Send Checkpoint Description -->
+		
+                            	</bpel:sequence>
+                            	<bpel:condition><![CDATA[not($continue)]]></bpel:condition>
+                            </bpel:repeatUntil>
+                            <!-- /Loop Task: Checkpoint Description Elaboration -->
+
+							<!-- Task: Update Building Data -->
+					   		<bpel:assign name="assign_getUpdateBuildingDataMessageInput" validate="no">
+								<bpel:copy>
+									<bpel:from>
+										<bpel:literal>
+											<tns:getUpdateBuildingDataMessageInput
+													xmlns:tns="http://it.univaq.incipict.ems/shm"
+													xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+													<instanceId>Instance1</instanceId>
+											</tns:getUpdateBuildingDataMessageInput>
+										</bpel:literal>
+									</bpel:from>
+									<bpel:to variable="getUpdateBuildingDataMessageInput" part="request"/>
+								</bpel:copy>
+								<bpel:copy>
+										<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+										<bpel:to variable="getUpdateBuildingDataMessageInput" part="request">
+											<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+												<![CDATA[instanceId]]>
+											</bpel:query>
+										</bpel:to>
+									</bpel:copy>
+							</bpel:assign>
+					
+							<bpel:invoke
+								inputVariable="getUpdateBuildingDataMessageInput"
+								name="invoke_getUpdateBuildingDataMessage"
+								operation="getUpdateBuildingDataMessage"
+								partnerLink="ShmConsumer"
+								outputVariable="updateBuildingDataRequest">
+								<bpel:correlations>
+										<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+									</bpel:correlations>
+							</bpel:invoke>
+					
+							<bpel:assign name="assign_forwardUpdateBuildingDataRequest" validate="no">
+								<bpel:copy>
+									<bpel:from variable="updateBuildingDataRequest" part="response"/>
+									<bpel:to variable="forwardUpdateBuildingDataRequest" part="request" />
+								</bpel:copy>
+							</bpel:assign>
+					
+							<bpel:invoke
+								inputVariable="forwardUpdateBuildingDataRequest"
+								name="invoke_updateBuildingData"
+								operation="UpdateBuildingData"
+								partnerLink="Ep"/>
+							<!-- /Task: Update Building Data -->
+						</bpel:sequence>
+					</bpel:elseif>
+					<!--  /Variant V2 -->
+
+					<bpel:elseif>
+						<!-- Variant V3 -->
+						<bpel:condition><![CDATA[$selectedVariant="v3"]]></bpel:condition>
+						<bpel:sequence>
+							<!-- Task: SHM - Send Missing Data Acknowledgement - EP -->
+							<bpel:assign name="assign_getSendMissingDataAcknowledgementMessageInput" validate="no">
+								<bpel:copy>
+									<bpel:from>
+										<bpel:literal>
+											<tns:getSendMissingDataAcknowledgementMessageInput
+													xmlns:tns="http://it.univaq.incipict.ems/ep"
+													xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+													<instanceId>Instance1</instanceId>
+											</tns:getSendMissingDataAcknowledgementMessageInput>
+										</bpel:literal>
+									</bpel:from>
+									<bpel:to variable="getSendMissingDataAcknowledgementMessageInput" part="request"/>
+								</bpel:copy>
+								<bpel:copy>
+									<bpel:from property="properties:instanceID" variable="receiveEndEventRequest" part="request"/>
+									<bpel:to variable="getSendMissingDataAcknowledgementMessageInput" part="request">
+										<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+											<![CDATA[instanceId]]>
+										</bpel:query>
+									</bpel:to>
+								</bpel:copy>
+							</bpel:assign>
+				
+							<bpel:invoke
+								inputVariable="getSendMissingDataAcknowledgementMessageInput"
+								name="invoke_getSendMissingDataAcknowledgementMessage"
+								operation="getSendMissingDataAcknowledgementMessage"
+								partnerLink="ShmConsumer"
+								outputVariable="missingDataAcknowledgementRequest">
+								<bpel:correlations>
+										<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+									</bpel:correlations>
+							</bpel:invoke>
+
+							<bpel:assign name="assign_forwardMissingDataAcknowledgementRequest" validate="no">
+								<bpel:copy>
+									<bpel:from variable="missingDataAcknowledgementRequest" part="response"/>
+									<bpel:to variable="forwardMissingDataAcknowledgementRequest" part="request" />
+								</bpel:copy>
+							</bpel:assign>
+
+							<bpel:invoke
+								inputVariable="forwardMissingDataAcknowledgementRequest"
+								name="invoke_sendMissingDataAcknowledgement"
+								operation="SendMissingDataAcknowledgement"
+								partnerLink="Ep"/>
+						</bpel:sequence>
+					</bpel:elseif>
+					<!-- /Variant V3 -->
+				</bpel:if>
+			</bpel:sequence>
+		</bpel:flow>
+
+		<bpel:exit/>
+    </bpel:sequence>
+</bpel:process>

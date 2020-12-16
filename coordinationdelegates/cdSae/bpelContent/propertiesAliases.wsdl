@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	name="propertiesAliases"
+	targetNamespace="http://it.univaq.incipict.ems/propertiesAliases"
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:properties="http://it.univaq.incipict.ems/properties"
+	xmlns:cdsae="http://it.univaq.incipict.ems/cdSae"
+	xmlns:cdbsa="http://it.univaq.incipict.ems/cdBsa"
+	xmlns:cdshm="http://it.univaq.incipict.ems/cdShm"
+	xmlns:sae="http://it.univaq.incipict.ems/sae">
+
+  <import location="cdSae.wsdl" namespace="http://it.univaq.incipict.ems/cdSae"/>
+  <import location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+  <import location="sae.wsdl" namespace="http://it.univaq.incipict.ems/sae"/>
+
+  <vprop:propertyAlias messageType="cdsae:signalEventRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>eventCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdsae:coordinationRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdbsa:notifyAlarmingRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:coordinationRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="sae:getActivateAlarmMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="sae:getNotifyAlarmingMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="sae:getSendPlanMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="sae:getActivatePanelsMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdsae:prepareRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>/</vprop:query>
+  </vprop:propertyAlias>
+
+</definitions>

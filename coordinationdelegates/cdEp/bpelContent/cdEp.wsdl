@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/cdEp"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="cdEp"
+	targetNamespace="http://it.univaq.incipict.ems/cdEp">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/cdEp">
+
+		<xsd:element name="buildingDataRequest" type="tns:buildingDataList"/>
+		<xsd:element name="updateBuildingDataRequest" type="tns:buildingDataList"/>
+		<xsd:element name="missingDataAcknowledgementRequest" type="tns:buildingDataList"/>
+		<xsd:element name="executeVariationRequest" type="tns:executeVariationRequest"/>
+    	<xsd:element name="prepareRequest" type="xsd:string"/>
+
+		<xsd:complexType name="buildingDataList">
+		  	<xsd:sequence>
+		  	  <xsd:element name="alarmCode" type="xsd:string"/>
+		  	  <xsd:element name="buildingData" type="tns:buildingData" maxOccurs="unbounded"/>
+		  	</xsd:sequence>
+	  	</xsd:complexType>
+
+		  <xsd:complexType name="buildingData">
+		  	<xsd:sequence>
+		  	  <xsd:element name="buildingID" type="xsd:string"/>
+		  	  <xsd:element name="status" type="tns:buildingClass"/>
+		  	</xsd:sequence>
+		  </xsd:complexType>
+	
+		  <xsd:simpleType name="buildingClass">
+		  	<xsd:restriction base="xsd:string">
+		  	  <xsd:enumeration value="A"/>
+		  	  <xsd:enumeration value="B"/>
+		  	  <xsd:enumeration value="C"/>
+		  	  <xsd:enumeration value="D"/>
+		  	  <xsd:enumeration value="E"/>
+		  	  <xsd:enumeration value="F"/>
+		  	</xsd:restriction>
+		  </xsd:simpleType>
+
+		  <xsd:complexType name="executeVariationRequest">
+		  	<xsd:sequence>
+		  	  <xsd:element name="name" type="xsd:string" />
+		  	  <xsd:element name="instanceId" type="xsd:string" />
+		  	</xsd:sequence>
+	  	  </xsd:complexType>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="prepareRequest">
+    <wsdl:part element="tns:prepareRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="buildingDataRequest">
+  	<wsdl:part element="tns:buildingDataRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="updateBuildingDataRequest">
+  	<wsdl:part element="tns:updateBuildingDataRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="missingDataAcknowledgementRequest">
+  	<wsdl:part element="tns:missingDataAcknowledgementRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="executeVariationRequest">
+    <wsdl:part element="tns:executeVariationRequest" name="request"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="cdEpPT">
+  	<wsdl:operation name="Prepare">
+      <wsdl:input message="tns:prepareRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendBuildingData">
+      <wsdl:input message="tns:buildingDataRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateBuildingData">
+      <wsdl:input message="tns:updateBuildingDataRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendMissingDataAcknowledgement">
+      <wsdl:input message="tns:missingDataAcknowledgementRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="ExecuteVariation">
+      <wsdl:input message="tns:executeVariationRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="cdEpBinding" type="tns:cdEpPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="Prepare">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+	<wsdl:operation name="SendBuildingData">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateBuildingData">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="SendMissingDataAcknowledgement">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="ExecuteVariation">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="cdEpService">
+    <wsdl:port binding="tns:cdEpBinding" name="cdEpPort">
+      <soap:address location="http://localhost:8080/ode/processes/cdEp"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

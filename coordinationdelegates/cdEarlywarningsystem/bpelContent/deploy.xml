@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:cdEarlywarningsystem="http://it.univaq.incipict.ems/cdEarlywarningsystem/" xmlns:cdEarlywarningsystem_1="http://it.univaq.incipict.ems/cdEarlywarningsystem" xmlns:cdSae="http://it.univaq.incipict.ems/cdSae" xmlns:cdShm="http://it.univaq.incipict.ems/cdShm" xmlns:it.univaq.inicipict.mid1.sia="http://it.univaq.inicipict.mid1.sia/">
+  <process name="cdEarlywarningsystem:cdEarlywarningsystemProcess.bpel">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="Client">
+      <service name="cdEarlywarningsystem_1:cdEarlywarningsystemService" port="cdEarlywarningsystemPort"/>
+    </provide>
+    <invoke partnerLink="Sae">
+      <service name="cdSae:cdSaeService" port="cdSaePort"/>
+    </invoke>
+    <invoke partnerLink="Shm">
+      <service name="cdShm:cdShmService" port="cdShmPort"/>
+    </invoke>
+    <invoke partnerLink="cdSaeCoordination">
+      <service name="cdSae:cdSaeService" port="cdSaeCoordinationPort"/>
+    </invoke>
+  </process>
+  <process name="it.univaq.inicipict.mid1.sia:InvocationAddressService">
+    <process-events generate="all"/>
+    <provide partnerLink="SIAService">
+      <service name="it.univaq.inicipict.mid1.sia:cdEarlywarningsystemSetInvocationAddressService" port="SetInvocationAddressServicePort"/>
+    </provide>
+  </process>
+</deploy>

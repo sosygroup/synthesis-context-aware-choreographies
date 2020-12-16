@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/crowding"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="crowding"
+	targetNamespace="http://it.univaq.incipict.ems/crowding">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/crowding">
+		<xsd:element name="crowdingDataRequest" type="tns:crowdingDataRequest"/>
+		<xsd:element name="crowdingDataResponse" type="tns:crowdingDataResponse"/>
+
+		<xsd:complexType name="crowdingDataRequest">
+		    <xsd:sequence>
+	    	  <xsd:element name="requestId" type="xsd:string" />
+		      <xsd:element name="areaCode" type="xsd:string" maxOccurs="unbounded" />
+		    </xsd:sequence>
+		  </xsd:complexType>
+		
+		  <xsd:complexType name="crowdingDataResponse">
+		    <xsd:sequence>
+		      <xsd:element name="requestId" type="xsd:string" />
+		      <xsd:element name="data" type="tns:crowdingData" maxOccurs="unbounded" />
+		    </xsd:sequence>
+		  </xsd:complexType>
+		
+		  <xsd:complexType name="crowdingData">
+		    <xsd:sequence>
+		      <xsd:element name="areaCode" type="xsd:string" />
+		      <xsd:element name="placeID" type="xsd:string" />
+		      <xsd:element name="peopleCounted" type="xsd:integer" />
+		    </xsd:sequence>
+	    </xsd:complexType>		
+	</xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="crowdingDataRequest">
+    <wsdl:part element="tns:crowdingDataRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="crowdingDataResponse">
+  	<wsdl:part element="tns:crowdingDataResponse" name="response"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="crowdingPT">
+    <wsdl:operation name="GetCrowdingData">
+      <wsdl:input message="tns:crowdingDataRequest"/>
+      <wsdl:output message="tns:crowdingDataResponse"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="crowdingBinding" type="tns:crowdingPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="GetCrowdingData">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="crowdingService">
+    <wsdl:port binding="tns:crowdingBinding" name="crowdingPort">
+      <soap:address location="http://localhost:9080/crowding/crowding"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

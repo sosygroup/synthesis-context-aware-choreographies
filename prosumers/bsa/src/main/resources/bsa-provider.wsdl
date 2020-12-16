@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/bsa"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="bsa"
+	targetNamespace="http://it.univaq.incipict.ems/bsa">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/bsa">
+
+		<xsd:element name="notifyAlarmingRequest" type="tns:alarmInfo"/>
+		<xsd:element name="secureBuildingsRequest" type="tns:buildingList"/>
+
+		<xsd:complexType name="alarmInfo">
+		    <xsd:sequence>
+		      <xsd:element name="alarmCode" type="xsd:string"/>
+		      <xsd:element name="timestamp" type="xsd:dateTime" />
+		      <xsd:element name="emergencyType" type="tns:emergencyType" />
+		      <xsd:element name="areaCode" type="xsd:string" maxOccurs="unbounded" />
+		    </xsd:sequence>
+	  	</xsd:complexType>
+
+		<xsd:complexType name="buildingList">
+			<xsd:sequence>
+			  <xsd:element name="alarmCode" type="xsd:string"/>
+			  <xsd:element name="buildingCode" type="xsd:string" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:simpleType name="emergencyType">
+		    <xsd:restriction base="xsd:string">
+		      <xsd:enumeration value="earthquake" />
+		      <xsd:enumeration value="fire" />
+		      <xsd:enumeration value="generalemergency" />
+		    </xsd:restriction>
+	  	</xsd:simpleType>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="notifyAlarmingRequest">
+    <wsdl:part element="tns:notifyAlarmingRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="secureBuildingsRequest">
+    <wsdl:part element="tns:secureBuildingsRequest" name="request"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="bsaPT">
+    <wsdl:operation name="NotifyAlarming">
+      <wsdl:input message="tns:notifyAlarmingRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="SecureBuildings">
+      <wsdl:input message="tns:secureBuildingsRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="bsaBinding" type="tns:bsaPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="NotifyAlarming">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="SecureBuildings">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="bsaService">
+    <wsdl:port binding="tns:bsaBinding" name="bsaPort">
+      <soap:address location="http://localhost:8080/bsa/bsa"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

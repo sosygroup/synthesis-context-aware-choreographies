@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<definitions name="cdBsa"
+        targetNamespace="http://it.univaq.incipict.ems/cdBsa/Artifacts"
+        xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:client="http://it.univaq.incipict.ems/cdBsa"
+		xmlns:bsa="http://it.univaq.incipict.ems/bsa"
+		xmlns:energy="http://it.univaq.incipict.ems/energy"
+		xmlns:buildingautomation="http://it.univaq.incipict.ems/buildingautomation">
+
+	<partnerLinkType name="ClientPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+		<role name="Client" portType="client:cdBsaPT"/>
+	</partnerLinkType>
+
+	<partnerLinkType name="BsaPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+		<role name="Bsa" portType="bsa:bsaPT"/>
+	</partnerLinkType>
+
+	<partnerLinkType name="BsaConsumerPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+		<role name="BsaConsumer" portType="bsa:bsaConsumerPT"/>
+	</partnerLinkType>
+
+	<partnerLinkType name="EnergyPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+		<role name="Energy" portType="energy:energyPT"/>
+	</partnerLinkType>
+
+	<partnerLinkType name="BuildingAutomationPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+		<role name="BuildingAutomation" portType="buildingautomation:buildingautomationPT"/>
+	</partnerLinkType>
+
+	<import location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+	<import location="bsa.wsdl" namespace="http://it.univaq.incipict.ems/bsa"/>
+	<import location="energy.wsdl" namespace="http://it.univaq.incipict.ems/energy"/>
+  	<import location="buildingautomation.wsdl" namespace="http://it.univaq.incipict.ems/buildingautomation"/>
+</definitions>

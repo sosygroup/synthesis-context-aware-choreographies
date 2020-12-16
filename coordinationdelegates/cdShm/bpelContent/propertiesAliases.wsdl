@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	name="propertiesAliases"
+	targetNamespace="http://it.univaq.incipict.ems/propertiesAliases"
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:properties="http://it.univaq.incipict.ems/properties"
+	xmlns:cdshm="http://it.univaq.incipict.ems/cdShm"
+	xmlns:cdbsa="http://it.univaq.incipict.ems/cdBsa"
+	xmlns:cdsae="http://it.univaq.incipict.ems/cdSae"
+	xmlns:cdep="http://it.univaq.incipict.ems/cdEp"
+	xmlns:ecd="http://it.univaq.incipict.ems/eCD"
+	xmlns:shm="http://it.univaq.incipict.ems/shm">
+
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+  <import location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+  <import location="cdEp.wsdl" namespace="http://it.univaq.incipict.ems/cdEp"/>
+  <import location="eCD.wsdl" namespace="http://it.univaq.incipict.ems/eCD"/>
+  <import location="shm.wsdl" namespace="http://it.univaq.incipict.ems/shm"/>
+
+  <vprop:propertyAlias messageType="cdshm:endEventRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>eventCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:livePhotogrammetryRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>flightId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:checkpointDescriptionRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>flightId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:executeVariationRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:coordinationRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdbsa:secureBuildingsRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdep:buildingDataRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdep:updateBuildingDataRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdep:missingDataAcknowledgementRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>alarmCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="ecd:executeChoreographyVPRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:endEventRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>eventCode</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:livePhotogrammetryRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>flightId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:checkpointDescriptionRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>flightId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:getBuildingDataMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:getSendBuildingDataMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:getSecureBuildingsMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:getCloseRoadsMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:getSendLiveFlightDetailsMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:getSendSimpleFlightDetailsMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:getUpdateBuildingDataMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="shm:getSendMissingDataAcknowledgementMessageInput" part="request" propertyName="properties:instanceID">
+    <vprop:query>instanceId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:prepareRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>/</vprop:query>
+  </vprop:propertyAlias>
+
+</definitions>

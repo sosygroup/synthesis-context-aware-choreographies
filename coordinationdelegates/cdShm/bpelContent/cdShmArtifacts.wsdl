@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions
+	targetNamespace="http://it.univaq.incipict.ems/cdShm/Artifacts"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:client="http://it.univaq.incipict.ems/cdShm"
+	xmlns:ecd="http://it.univaq.incipict.ems/eCD"
+	xmlns:shm="http://it.univaq.incipict.ems/shm"
+	xmlns:bsa="http://it.univaq.incipict.ems/cdBsa"
+	xmlns:ep="http://it.univaq.incipict.ems/cdEp"
+	xmlns:roads="http://it.univaq.incipict.ems/roads"
+	xmlns:sensornetwork="http://it.univaq.incipict.ems/sensornetwork"
+	xmlns:dronefleetcontroller="http://it.univaq.incipict.ems/dronefleetcontroller">
+  
+  <partnerLinkType name="ClientPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Client" portType="client:cdShmPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="eCDPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="eCD" portType="ecd:eCDPT"/>
+  </partnerLinkType> 
+  
+  <partnerLinkType name="ShmPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Shm" portType="shm:shmPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="ShmConsumerPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="ShmConsumer" portType="shm:shmConsumerPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="EpPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Ep" portType="ep:cdEpPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="BsaPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Bsa" portType="bsa:cdBsaPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="RoadsPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Roads" portType="roads:roadsPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="SensorNetworkPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="SensorNetwork" portType="sensornetwork:SensorNetworkPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="DroneFleetControllerPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="DroneFleetController" portType="dronefleetcontroller:DroneFleetControllerPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="ClientCoordinationPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Client" portType="client:cdShmCoordinationPT"/>
+  </partnerLinkType>
+
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+  <import location="eCD.wsdl" namespace="http://it.univaq.incipict.ems/eCD"/>
+  <import location="shm.wsdl" namespace="http://it.univaq.incipict.ems/shm"/>
+  <import location="cdEp.wsdl" namespace="http://it.univaq.incipict.ems/cdEp"/>
+  <import location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+  <import location="roads.wsdl" namespace="http://it.univaq.incipict.ems/roads"/>
+  <import location="sensornetwork.wsdl" namespace="http://it.univaq.incipict.ems/sensornetwork"/>
+  <import location="dronefleetcontroller.wsdl" namespace="http://it.univaq.incipict.ems/dronefleetcontroller"/>
+</definitions>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions
+		xmlns:tns="http://it.univaq.inicipict.mid1.sia/"
+		targetNamespace="http://it.univaq.inicipict.mid1.sia/Artifacts"
+		xmlns="http://schemas.xmlsoap.org/wsdl/">
+
+  <import location="cdBsaSIAService.wsdl" namespace="http://it.univaq.inicipict.mid1.sia/"/>
+
+  <partnerLinkType name="SIAPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+  	<role name="SIARole" portType="tns:SetInvocationAddressPT"/>
+  </partnerLinkType>
+  
+</definitions>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions
+	targetNamespace="http://it.univaq.incipict.ems/eCD/Artifacts"
+	xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:client="http://it.univaq.incipict.ems/eCD"
+	xmlns:cdshm="http://it.univaq.incipict.ems/cdShm"
+	xmlns:cdep="http://it.univaq.incipict.ems/cdEp"
+	xmlns:contextevaluator="http://it.univaq.incipict.ems/contextevaluator">
+  
+  <partnerLinkType name="ClientPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="Client" portType="client:eCDPT"/>
+  </partnerLinkType>
+
+
+  <partnerLinkType name="cdShmPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="cdShm" portType="cdshm:cdShmPT"/>
+  </partnerLinkType> 
+
+  <partnerLinkType name="cdEpPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="cdEp" portType="cdep:cdEpPT"/>
+  </partnerLinkType>
+
+  <partnerLinkType name="ContextEvaluatorPLT" xmlns="http://docs.oasis-open.org/wsbpel/2.0/plnktype">
+    <role name="ContextEvaluator" portType="contextevaluator:ContextEvaluatorPT"/>
+  </partnerLinkType>
+
+  <import location="eCD.wsdl" namespace="http://it.univaq.incipict.ems/eCD"/>
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+  <import location="cdEp.wsdl" namespace="http://it.univaq.incipict.ems/cdEp"/>
+  <import location="contextevaluator.wsdl" namespace="http://it.univaq.incipict.ems/contextevaluator"/>	
+</definitions>

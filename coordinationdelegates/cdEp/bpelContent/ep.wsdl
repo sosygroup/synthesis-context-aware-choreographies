@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/ep"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="ep"
+	targetNamespace="http://it.univaq.incipict.ems/ep">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/ep">
+
+		<xsd:element name="buildingDataRequest" type="tns:buildingDataList"/>
+		<xsd:element name="updateBuildingDataRequest" type="tns:buildingDataList"/>
+		<xsd:element name="missingDataAcknowledgementRequest" type="tns:buildingDataList"/>
+		<xsd:element name="getCrowdingDataMessageInput" type="tns:instanceInfo"/>
+		<xsd:element name="crowdingDataRequest" type="tns:crowdingDataRequest"/>
+		<xsd:element name="crowdingDataResponse" type="tns:crowdingDataResponse"/>
+		<xsd:element name="getSendInterventionPlanMessageInput" type="tns:instanceInfo"/>
+		<xsd:element name="interventionPlanRequest" type="tns:interventionPlan"/>
+		<xsd:element name="getSendBuildingDataMessageInput" type="tns:instanceInfo"/>
+		<xsd:element name="getUpdateInterventionPlanMessageInput" type="tns:instanceInfo"/>
+		<xsd:element name="interventionPlanUpdateRequest" type="tns:interventionPlan"/>
+		<xsd:element name="getSendNotificationMessageInput" type="tns:instanceInfo"/>
+		<xsd:element name="sendNotificationRequest" type="tns:notification"/>
+		<xsd:element name="emptyResponse" type="tns:emptyResponse"/>
+	
+		<xsd:complexType name="buildingDataList">
+		  	<xsd:sequence>
+		  	  <xsd:element name="alarmCode" type="xsd:string"/>
+		  	  <xsd:element name="buildingData" type="tns:buildingData" maxOccurs="unbounded"/>
+		  	</xsd:sequence>
+	  	</xsd:complexType>
+		
+		<xsd:complexType name="buildingData">
+			<xsd:sequence>
+			  <xsd:element name="buildingID" type="xsd:string"/>
+			  <xsd:element name="status" type="tns:buildingClass"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		
+		<xsd:simpleType name="buildingClass">
+			<xsd:restriction base="xsd:string">
+			  <xsd:enumeration value="A"/>
+			  <xsd:enumeration value="B"/>
+			  <xsd:enumeration value="C"/>
+			  <xsd:enumeration value="D"/>
+			  <xsd:enumeration value="E"/>
+			  <xsd:enumeration value="F"/>
+			</xsd:restriction>
+		</xsd:simpleType>
+
+		<xsd:complexType name="notification">
+			<xsd:sequence>
+			    <xsd:element name="alarmCode" type="xsd:string"/>
+				<xsd:element name="type" type="xsd:string" />
+				<xsd:element name="text" type="xsd:string" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="crowdingDataRequest">
+			<xsd:sequence>
+			  <xsd:element name="requestId" type="xsd:string" />
+			  <xsd:element name="areaCode" type="xsd:string" maxOccurs="unbounded" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+	    <xsd:complexType name="crowdingDataResponse">
+		    <xsd:sequence>
+		      <xsd:element name="requestId" type="xsd:string" />
+		      <xsd:element name="data" type="tns:crowdingData" maxOccurs="unbounded" />
+		    </xsd:sequence>
+		</xsd:complexType>
+		
+  		<xsd:complexType name="crowdingData">
+		    <xsd:sequence>
+		      <xsd:element name="areaCode" type="xsd:string" />
+		      <xsd:element name="placeID" type="xsd:string" />
+		      <xsd:element name="peopleCounted" type="xsd:integer" />
+		    </xsd:sequence>
+	    </xsd:complexType>
+
+		<xsd:complexType name="placeInfo">
+			<xsd:sequence>
+				<xsd:element name="placeID" type="xsd:string" />
+				<xsd:element name="buildingClass" type="tns:buildingClass" />
+				<xsd:element name="peopleCounted" type="xsd:integer" />
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="interventionPlan">
+		  <xsd:sequence>
+		    <xsd:element name="alarmCode" type="xsd:string"/>
+		    <xsd:element name="highestPriority" minOccurs="0">
+		      <xsd:complexType>
+		        <xsd:sequence>
+		          <xsd:element name="placeInfos" type="tns:placeInfo" maxOccurs="unbounded"/>
+		        </xsd:sequence>
+		      </xsd:complexType>
+		    </xsd:element>
+		    <xsd:element name="mediumPriority" minOccurs="0">
+		      <xsd:complexType>
+		        <xsd:sequence>
+		          <xsd:element name="placeInfos" type="tns:placeInfo" maxOccurs="unbounded"/>
+		        </xsd:sequence>
+		      </xsd:complexType>
+		    </xsd:element>
+		    <xsd:element name="lowestPriority" minOccurs="0">
+		      <xsd:complexType>
+		        <xsd:sequence>
+		          <xsd:element name="placeInfos" type="tns:placeInfo" maxOccurs="unbounded"/>
+		        </xsd:sequence>
+		      </xsd:complexType>
+		    </xsd:element>
+		  </xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="instanceInfo">
+			<xsd:sequence>
+				<xsd:element name="instanceId" type="xsd:string"/>
+			</xsd:sequence>
+		</xsd:complexType>
+
+		<xsd:complexType name="emptyResponse">
+			<xsd:sequence/>
+		</xsd:complexType>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="buildingDataRequest">
+  	<wsdl:part element="tns:buildingDataRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="updateBuildingDataRequest">
+  	<wsdl:part element="tns:updateBuildingDataRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="missingDataAcknowledgementRequest">
+  	<wsdl:part element="tns:missingDataAcknowledgementRequest" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="getCrowdingDataMessageInput">
+  	<wsdl:part element="tns:getCrowdingDataMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="crowdingDataRequest">
+  	<wsdl:part element="tns:crowdingDataRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="crowdingDataResponse">
+  	<wsdl:part element="tns:crowdingDataResponse" name="message"/>
+  </wsdl:message>
+  <wsdl:message name="getSendInterventionPlanMessageInput">
+  	<wsdl:part element="tns:getSendInterventionPlanMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="interventionPlanRequest">
+  	<wsdl:part element="tns:interventionPlanRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getSendBuildingDataMessageInput">
+  	<wsdl:part element="tns:getSendBuildingDataMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="sendBuildingDataRequest">
+  	<wsdl:part element="tns:buildingDataRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getUpdateInterventionPlanMessageInput">
+  	<wsdl:part element="tns:getUpdateInterventionPlanMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="interventionPlanUpdateRequest">
+  	<wsdl:part element="tns:interventionPlanUpdateRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="getSendNotificationMessageInput">
+  	<wsdl:part element="tns:getSendNotificationMessageInput" name="request"/>
+  </wsdl:message>
+  <wsdl:message name="sendNotificationRequest">
+  	<wsdl:part element="tns:sendNotificationRequest" name="response"/>
+  </wsdl:message>
+  <wsdl:message name="emptyResponse">
+  	<wsdl:part element="tns:emptyResponse" name="response"/>
+  </wsdl:message>
+
+  <!-- Provider part -->
+  <wsdl:portType name="epPT">
+    <wsdl:operation name="SendBuildingData">
+      <wsdl:input message="tns:buildingDataRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateBuildingData">
+      <wsdl:input message="tns:updateBuildingDataRequest"/>
+    </wsdl:operation>
+    <wsdl:operation name="SendMissingDataAcknowledgement">
+      <wsdl:input message="tns:missingDataAcknowledgementRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="epBinding" type="tns:epPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="SendBuildingData">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="UpdateBuildingData">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+    <wsdl:operation name="SendMissingDataAcknowledgement">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <!-- Consumer Part -->
+  <wsdl:portType name="epConsumerPT">
+  	<wsdl:operation name="storeSendBuildingDataRequest">
+  	  <wsdl:input message="tns:buildingDataRequest"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="getGetCrowdingDataMessage">
+  	  <wsdl:input message="tns:getCrowdingDataMessageInput"/>
+  	  <wsdl:output message="tns:crowdingDataRequest"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="storeGetCrowdingDataResponse">
+  	  <wsdl:input message="tns:crowdingDataResponse"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="getSendInterventionPlanMessage">
+  	  <wsdl:input message="tns:getSendInterventionPlanMessageInput"/>
+  	  <wsdl:output message="tns:interventionPlanRequest"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="getUpdateInterventionPlanMessage">
+  	  <wsdl:input message="tns:getUpdateInterventionPlanMessageInput"/>
+  	  <wsdl:output message="tns:interventionPlanUpdateRequest"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="getSendBuildingDataMessage">
+  	  <wsdl:input message="tns:getSendBuildingDataMessageInput"/>
+  	  <wsdl:output message="tns:sendBuildingDataRequest"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="getSendNotificationMessage">
+  	  <wsdl:input message="tns:getSendNotificationMessageInput"/>
+  	  <wsdl:output message="tns:sendNotificationRequest"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="storeUpdateBuildingDataRequest">
+  	  <wsdl:input message="tns:updateBuildingDataRequest"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+  	<wsdl:operation name="storeSendMissingDataAcknowledgementRequest">
+  	  <wsdl:input message="tns:missingDataAcknowledgementRequest"/>
+  	  <wsdl:output message="tns:emptyResponse"/>
+  	</wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="epConsumerBinding" type="tns:epConsumerPT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="storeSendBuildingDataRequest">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getGetCrowdingDataMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="storeGetCrowdingDataResponse">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSendInterventionPlanMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getUpdateInterventionPlanMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSendBuildingDataMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getSendNotificationMessage">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="storeUpdateBuildingDataRequest">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="storeSendMissingDataAcknowledgementRequest">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="epService">
+    <!-- Provider port -->
+    <wsdl:port binding="tns:epBinding" name="epPort">
+      <soap:address location="http://localhost:9080/ep/ep"/>
+    </wsdl:port>
+    <!-- Consumer port -->
+    <wsdl:port binding="tns:epConsumerBinding" name="epConsumerPort">
+      <soap:address location="http://localhost:9080/ep/consumer"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

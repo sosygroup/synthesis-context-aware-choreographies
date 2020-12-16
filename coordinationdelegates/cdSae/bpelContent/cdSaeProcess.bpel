@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes" name="cdSaeProcess.bpel"
+    targetNamespace="http://it.univaq.incipict.ems/cdSae/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://it.univaq.incipict.ems/cdSae/Artifacts"
+    xmlns:client="http://it.univaq.incipict.ems/cdSae"
+    xmlns:sae="http://it.univaq.incipict.ems/sae"
+    xmlns:bsa="http://it.univaq.incipict.ems/cdBsa"
+    xmlns:cityalarming="http://it.univaq.incipict.ems/cityalarming"
+    xmlns:smartevacuation="http://it.univaq.incipict.ems/smartevacuation"
+    xmlns:cdshm="http://it.univaq.incipict.ems/cdShm"
+    xmlns:properties="http://it.univaq.incipict.ems/properties">
+
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdSaeArtifacts.wsdl" namespace="http://it.univaq.incipict.ems/cdSae/Artifacts"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdSae.wsdl" namespace="http://it.univaq.incipict.ems/cdSae"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="sae.wsdl" namespace="http://it.univaq.incipict.ems/sae"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cityalarming.wsdl" namespace="http://it.univaq.incipict.ems/cityalarming"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="smartevacuation.wsdl" namespace="http://it.univaq.incipict.ems/smartevacuation"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="propertiesAliases.wsdl" namespace="http://it.univaq.incipict.ems/propertiesAliases"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="properties.wsdl" namespace="http://it.univaq.incipict.ems/properties"/>
+
+    <bpel:partnerLinks>
+        <bpel:partnerLink name="SaeClient" myRole="Client" partnerLinkType="ns:ClientPLT"/>
+        <bpel:partnerLink name="SaeProvider" partnerRole="Sae" partnerLinkType="ns:SaePLT"/>
+        <bpel:partnerLink name="SaeConsumer" partnerRole="SaeConsumer" partnerLinkType="ns:SaeConsumerPLT"/>
+        <bpel:partnerLink name="Bsa" partnerRole="Bsa" partnerLinkType="ns:BsaPLT"/>
+        <bpel:partnerLink name="CityAlarming" partnerRole="CityAlarming" partnerLinkType="ns:CityAlarmingPLT"/>
+        <bpel:partnerLink name="SmartEvacuation" partnerRole="SmartEvacuation" partnerLinkType="ns:SmartEvacuationPLT"/>
+        <bpel:partnerLink name="SaeClientCoordination" myRole="Client" partnerLinkType="ns:ClientCoordinationPLT"/>
+        <bpel:partnerLink name="cdShmCoordination" partnerRole="cdShm" partnerLinkType="ns:cdShmCoordinationPLT"/>
+    </bpel:partnerLinks>
+
+    <bpel:variables>
+        <bpel:variable messageType="client:signalEventRequest" name="receivedSignalEventRequest"/>
+        <bpel:variable messageType="sae:signalEventRequest" name="forwardedSignalEventRequest"/>
+
+        <bpel:variable messageType="sae:getActivateAlarmMessageInput" name="getActivateAlarmMessageInput"/>
+        <bpel:variable messageType="sae:activateAlarmRequest" name="getActivateAlarmRequest"/>
+
+        <bpel:variable messageType="sae:getNotifyAlarmingMessageInput" name="getNotifyAlarmingMessageInput"/>
+        <bpel:variable messageType="sae:notifyAlarmingRequest" name="getNotifyAlarmingRequest"/>
+
+		<bpel:variable messageType="sae:getSendPlanMessageInput" name="getSendPlanMessageInput"/>
+        <bpel:variable messageType="sae:sendPlanRequest" name="getSendPlanRequest"/>
+        <bpel:variable messageType="sae:sendPlanResponse" name="forwardedSendPlanResponse"/>
+
+		<bpel:variable messageType="sae:getActivatePanelsMessageInput" name="getActivatePanelsMessageInput"/>
+		<bpel:variable messageType="sae:activatePanelsRequest" name="getActivatePanelsRequest"/>
+
+        <bpel:variable messageType="cityalarming:activateAlarmRequest" name="activateAlarmRequest"/>
+        <bpel:variable messageType="bsa:notifyAlarmingRequest" name="notifyAlarmingRequest"/>
+        <bpel:variable messageType="smartevacuation:sendPlanRequest" name="sendPlanRequest"/>
+        <bpel:variable messageType="smartevacuation:sendPlanResponse" name="sendPlanResponse"/>
+        <bpel:variable messageType="smartevacuation:activatePanelsRequest" name="activatePanelsRequest"/>
+
+		<bpel:variable messageType="sae:emptyResponse" name="emptyResponse"/>
+
+		<bpel:variable messageType="client:coordinationRequest" name="clientCoordinationRequest"/>
+		<bpel:variable messageType="cdshm:coordinationRequest" name="cdShmCoordinationRequest"/>
+
+		<bpel:variable messageType="client:prepareRequest" name="prepareRequest"/>
+
+		<bpel:variable name="myName" type="xsd:string"/>
+		<bpel:variable name="SaeProviderName" type="xsd:string"/>
+		<bpel:variable name="SaeProviderAddress" type="xsd:string"/>
+		<bpel:variable name="SaeConsumerName" type="xsd:string"/>
+		<bpel:variable name="SaeConsumerAddress" type="xsd:string"/>
+		<bpel:variable name="cdBsaName" type="xsd:string"/>
+		<bpel:variable name="cdBsaAddress" type="xsd:string"/>
+		<bpel:variable name="cdShmCoordinationName" type="xsd:string"/>
+		<bpel:variable name="cdShmCoordinationAddress" type="xsd:string"/>
+		<bpel:variable name="CityAlarmingName" type="xsd:string"/>
+		<bpel:variable name="CityAlarmingAddress" type="xsd:string"/>
+		<bpel:variable name="SmartEvacuationName" type="xsd:string"/>
+		<bpel:variable name="SmartEvacuationAddress" type="xsd:string"/>
+    </bpel:variables>
+
+	<bpel:correlationSets>
+		<bpel:correlationSet
+			name="CorrelationSetInstanceID" properties="properties:instanceID" />
+	</bpel:correlationSets>
+ 
+    <bpel:sequence name="MainSequence">
+
+		<bpel:receive createInstance="yes" operation="Prepare"
+    		partnerLink="SaeClient" portType="client:cdSaePT"
+    		variable="prepareRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+		<!-- Instancing name and address variables -->
+		<!-- Client -->
+		<bpel:assign name="assign_myName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdSae</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="myName"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Sae Provider -->
+        <bpel:assign name="assign_SaeProviderName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>SaeProvider</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="SaeProviderName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_SaeProviderAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="SaeProvider"/>
+            <bpel:to variable="SaeProviderAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_SaeProviderAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $SaeProviderName, $SaeProviderAddress)]]></bpel:from>
+            <bpel:to partnerLink="SaeProvider"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Sae Consumer -->
+        <bpel:assign name="assign_SaeConsumerName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>SaeConsumer</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="SaeConsumerName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_SaeConsumerAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="SaeConsumer"/>
+            <bpel:to variable="SaeConsumerAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_SaeConsumerAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $SaeConsumerName, $SaeConsumerAddress)]]></bpel:from>
+            <bpel:to partnerLink="SaeConsumer"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdBsa -->
+        <bpel:assign name="assign_cdBsaName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdBsa</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdBsaName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdBsaAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="Bsa"/>
+            <bpel:to variable="cdBsaAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdBsaAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdBsaName, $cdBsaAddress)]]></bpel:from>
+            <bpel:to partnerLink="Bsa"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- cdShmCoordination -->
+        <bpel:assign name="assign_cdShmCoordinationName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdShmCoordination</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="cdShmCoordinationName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_cdShmCoordinationAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="cdShmCoordination"/>
+            <bpel:to variable="cdShmCoordinationAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_cdShmCoordinationAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdShmCoordinationName, $cdShmCoordinationAddress)]]></bpel:from>
+            <bpel:to partnerLink="cdShmCoordination"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- CityAlarming -->
+        <bpel:assign name="assign_CityAlarmingName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>CityAlarming</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="CityAlarmingName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_CityAlarmingAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="CityAlarming"/>
+            <bpel:to variable="CityAlarmingAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_CityAlarmingAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $CityAlarmingName, $CityAlarmingAddress)]]></bpel:from>
+            <bpel:to partnerLink="CityAlarming"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- SmartEvacuation -->
+        <bpel:assign name="assign_SmartEvacuationName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>SmartEvacuation</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="SmartEvacuationName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_SmartEvacuationAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="SmartEvacuation"/>
+            <bpel:to variable="SmartEvacuationAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_SmartEvacuationAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $SmartEvacuationName, $SmartEvacuationAddress)]]></bpel:from>
+            <bpel:to partnerLink="SmartEvacuation"/>
+          </bpel:copy>
+        </bpel:assign>
+        <!-- /Instancing name and address variables -->
+
+        <bpel:receive
+        		createInstance="no"
+        		name="receive_signalEvent"
+        		operation="SignalEvent"
+        		partnerLink="SaeClient"
+        		portType="client:cdSaePT"
+        		variable="receivedSignalEventRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+    		
+ 		<bpel:assign name="assign_forwardSignalEventRequest" validate="no">
+			<bpel:copy>
+				<bpel:from variable="receivedSignalEventRequest" part="request" />
+				<bpel:to variable="forwardedSignalEventRequest" part="message" />
+			</bpel:copy>
+		</bpel:assign>
+
+		<!-- Invoke sae provider for signal event send -->
+		<bpel:invoke inputVariable="forwardedSignalEventRequest"
+				name="invoke_signalEvent"
+				operation="SignalEvent"
+				partnerLink="SaeProvider" />
+
+		<!-- Invoke sae consumer for store signal event (NOTE: Message type is the same than the provider) -->
+		<bpel:invoke inputVariable="forwardedSignalEventRequest"
+				name="invoke_store_signalEventRequest"
+				operation="storeSignalEventRequest"
+				partnerLink="SaeConsumer"
+				outputVariable="emptyResponse" />
+
+		<bpel:flow>
+			<bpel:sequence>
+				<!-- Invoke activate alarm to city alarming:
+						1) get from sae consumer part
+						2) invoke service -->
+
+				<bpel:assign name="assign_getActivateAlarmMessageInput" validate="no">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<tns:getActivateAlarmMessageInput xmlns:tns="http://it.univaq.incipict.ems/sae" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+										<instanceId>InstanceID</instanceId>
+								</tns:getActivateAlarmMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getActivateAlarmMessageInput" part="request" />
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receivedSignalEventRequest" part="request"/>
+						<bpel:to variable="getActivateAlarmMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="getActivateAlarmMessageInput"
+						name="invoke_getActivateAlermRequest"
+						operation="getActivateAlarmMessage"
+						partnerLink="SaeConsumer"
+						outputVariable="getActivateAlarmRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_activateAlarmRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="getActivateAlarmRequest" part="response" />
+						<bpel:to variable="activateAlarmRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="activateAlarmRequest"
+						name="invoke_activateAlarm"
+						operation="ActivateAlarm"
+						partnerLink="CityAlarming" />
+			</bpel:sequence>
+
+			<bpel:sequence>
+				<!-- Invoke notify alarming to bsa:
+						1) get from sae consumer part
+						2) invoke service -->
+
+				<bpel:assign name="assign_getNotifyAlarmingMessageInput">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<ns1:getNotifyAlarmingMessageInput xmlns:ns1="http://it.univaq.incipict.ems/sae" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+									<instanceId>InstanceID</instanceId>
+								</ns1:getNotifyAlarmingMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getNotifyAlarmingMessageInput" part="request" />
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receivedSignalEventRequest" part="request"/>
+						<bpel:to variable="getNotifyAlarmingMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="getNotifyAlarmingMessageInput"
+						name="invoke_getNotifyAlarmingRequest"
+						operation="getNotifyAlarmingMessage"
+						partnerLink="SaeConsumer"
+						outputVariable="getNotifyAlarmingRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_notifyAlarmRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="getNotifyAlarmingRequest" part="response" />
+						<bpel:to variable="notifyAlarmingRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="notifyAlarmingRequest"
+						name="invoke_NotifyAlarming"
+						operation="NotifyAlarming"
+						partnerLink="Bsa">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+				</bpel:invoke>
+			</bpel:sequence>
+
+			<bpel:sequence>
+				<!-- Invoke sendPlan to smart evacuation:
+						1) get from sae consumer part
+						2) invoke service -->
+
+				<bpel:assign name="assign_getSendPlanMessageInput">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<ns1:getSendPlanMessageInput xmlns:ns1="http://it.univaq.incipict.ems/sae" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+									<instanceId>InstanceID</instanceId>
+								</ns1:getSendPlanMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getSendPlanMessageInput" part="request" />
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receivedSignalEventRequest" part="request"/>
+						<bpel:to variable="getSendPlanMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="getSendPlanMessageInput"
+						outputVariable="getSendPlanRequest"
+						name="invoke_getSendPlanMessage"
+						operation="getSendPlanMessage"
+						partnerLink="SaeConsumer">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_notifyAlarmRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="getSendPlanRequest" part="response" />
+						<bpel:to variable="sendPlanRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="sendPlanRequest"
+						outputVariable="sendPlanResponse"
+						name="invoke_sendPlan"
+						operation="SendPlan"
+						partnerLink="SmartEvacuation" />
+
+				<!-- Storing response to sae -->
+		 		<bpel:assign name="assign_forwardSendPlanResponse" validate="no">
+					<bpel:copy>
+						<bpel:from variable="sendPlanResponse" part="response" />
+						<bpel:to variable="forwardedSendPlanResponse" part="message" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="forwardedSendPlanResponse"
+						name="invoke_store_sendPlanResponse"
+						operation="storeSendPlanResponse"
+						partnerLink="SaeConsumer"
+						outputVariable="emptyResponse" />
+
+				<!-- Send coordination message to SAE-->
+				<bpel:assign name="assign_cdShmCoordinationRequest" validate="no">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<tns:coordinationRequest
+										xmlns:tns="http://it.univaq.incipict.ems/shm"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+										<instanceId>InstanceID</instanceId>
+								</tns:coordinationRequest>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="cdShmCoordinationRequest" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receivedSignalEventRequest" part="request"/>
+						<bpel:to variable="cdShmCoordinationRequest" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+				<bpel:invoke
+					inputVariable="cdShmCoordinationRequest"
+					name="invoke_StepCoordinationPoint1"
+					operation="StepCoordinationPoint1"
+					partnerLink="cdShmCoordination">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+				</bpel:invoke>
+		
+				<!-- Wait for coordination message from SAE -->
+				<bpel:receive
+					createInstance="no"
+					name="receive_synch"
+					operation="StepCoordinationPoint1"
+		    		partnerLink="SaeClientCoordination"
+		    		portType="client:cdSaeCoordinationPT"
+		    		variable="clientCoordinationRequest">
+		    		<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+		   		</bpel:receive>
+
+				<!-- Invoke activatePanels to smart evacuation:
+						1) get from sae consumer part
+						2) invoke service -->
+
+				<bpel:assign name="assign_getActivatePanelsMessageInput">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<ns1:getActivatePanelsMessageInput xmlns:ns1="http://it.univaq.incipict.ems/sae" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+									<instanceId>InstanceID</instanceId>
+								</ns1:getActivatePanelsMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getActivatePanelsMessageInput" part="request" />
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="receivedSignalEventRequest" part="request"/>
+						<bpel:to variable="getActivatePanelsMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="getActivatePanelsMessageInput"
+						outputVariable="getActivatePanelsRequest"
+						name="invoke_getActivatePanelsRequest"
+						operation="getActivatePanelsMessage"
+						partnerLink="SaeConsumer">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_notifyAlarmRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="getActivatePanelsRequest" part="response" />
+						<bpel:to variable="activatePanelsRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke inputVariable="activatePanelsRequest"
+						name="invoke_activatePanels"
+						operation="ActivatePanels"
+						partnerLink="SmartEvacuation" />
+			</bpel:sequence>
+		</bpel:flow>
+
+		<bpel:exit />
+    </bpel:sequence>
+</bpel:process>

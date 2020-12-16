@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://it.univaq.incipict.ems/cdSae"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="cdSae"
+	targetNamespace="http://it.univaq.incipict.ems/cdSae">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://it.univaq.incipict.ems/cdSae">
+ 	    <xsd:element name="prepareRequest" type="xsd:string"/>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="prepareRequest">
+    <wsdl:part element="tns:prepareRequest" name="request"/>
+  </wsdl:message>
+ 
+  <wsdl:portType name="cdSaePT">
+  	<wsdl:operation name="Prepare">
+      <wsdl:input message="tns:prepareRequest"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="cdSaeBinding" type="tns:cdSaePT">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="Prepare">
+      <soap:operation soapAction=""/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="cdSaeService">
+    <wsdl:port binding="tns:cdSaeBinding" name="cdSaePort">
+      <soap:address location="http://localhost:8080/ode/processes/cdSae"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

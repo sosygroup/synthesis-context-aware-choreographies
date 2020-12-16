@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:cdDrone="http://it.univaq.incipict.ems/cdDrone/" xmlns:cdDrone_1="http://it.univaq.incipict.ems/cdDrone" xmlns:cdShm="http://it.univaq.incipict.ems/cdShm" xmlns:it.univaq.inicipict.mid1.sia="http://it.univaq.inicipict.mid1.sia/">
+  <process name="cdDrone:cdDroneProcess.bpel">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="Client">
+      <service name="cdDrone_1:cdDroneService" port="cdDronePort"/>
+    </provide>
+    <invoke partnerLink="Shm">
+      <service name="cdShm:cdShmService" port="cdShmPort"/>
+    </invoke>
+  </process>
+  <process name="it.univaq.inicipict.mid1.sia:InvocationAddressService">
+    <process-events generate="all"/>
+    <provide partnerLink="SIAService">
+      <service name="it.univaq.inicipict.mid1.sia:cdDroneSetInvocationAddressService" port="SetInvocationAddressServicePort"/>
+    </provide>
+  </process>
+</deploy>

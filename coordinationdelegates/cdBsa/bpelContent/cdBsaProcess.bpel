@@ -1,0 +1,342 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes" name="cdBsaProcess.bpel"
+    targetNamespace="http://it.univaq.incipict.ems/cdBsa/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://it.univaq.incipict.ems/cdBsa/Artifacts"
+    xmlns:client="http://it.univaq.incipict.ems/cdBsa"
+    xmlns:bsa="http://it.univaq.incipict.ems/bsa"
+    xmlns:buildingautomation="http://it.univaq.incipict.ems/buildingautomation"
+    xmlns:energy="http://it.univaq.incipict.ems/energy"
+    xmlns:properties="http://it.univaq.incipict.ems/properties">
+
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdBsaArtifacts.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa/Artifacts"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdBsa.wsdl" namespace="http://it.univaq.incipict.ems/cdBsa"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="bsa.wsdl" namespace="http://it.univaq.incipict.ems/bsa"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="energy.wsdl" namespace="http://it.univaq.incipict.ems/energy"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="buildingautomation.wsdl" namespace="http://it.univaq.incipict.ems/buildingautomation"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="propertiesAliases.wsdl" namespace="http://it.univaq.incipict.ems/propertiesAliases"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="properties.wsdl" namespace="http://it.univaq.incipict.ems/properties"/>
+
+    <bpel:partnerLinks>
+        <bpel:partnerLink name="BsaClient" myRole="Client" partnerLinkType="ns:ClientPLT"/>
+        <bpel:partnerLink name="BsaProvider" partnerRole="Bsa" partnerLinkType="ns:BsaPLT"/>
+        <bpel:partnerLink name="BsaConsumer" partnerRole="BsaConsumer" partnerLinkType="ns:BsaConsumerPLT"/>
+        <bpel:partnerLink name="Energy" partnerRole="Energy" partnerLinkType="ns:EnergyPLT"/>
+        <bpel:partnerLink name="BuildingAutomation" partnerRole="BuildingAutomation" partnerLinkType="ns:BuildingAutomationPLT"/>
+    </bpel:partnerLinks>
+
+    <bpel:variables>
+        <bpel:variable messageType="client:notifyAlarmingRequest" name="notifyAlarmingRequest"/>
+        <bpel:variable messageType="bsa:notifyAlarmingRequest" name="forwardNotifyAlarmingRequest"/>
+
+		<bpel:variable messageType="bsa:getSignalStopElevatorsMessageInput" name="getSignalStopElevatorsMessageInput"/>
+		<bpel:variable messageType="bsa:signalStopElevatorsRequest" name="getSignalStopElevatorsRequest"/>
+		<bpel:variable messageType="buildingautomation:signalStopElevatorsRequest" name="signalStopElevatorsRequest"/>
+
+		<bpel:variable messageType="client:secureBuildingsRequest" name="secureBuildingsRequest"/>
+        <bpel:variable messageType="bsa:secureBuildingsRequest" name="forwardSecureBuildingsRequest"/>
+
+		<bpel:variable messageType="bsa:getShutdownPlantsMessageInput" name="getShutdownPlantsMessageInput"/>
+		<bpel:variable messageType="bsa:shutdownPlantsRequest" name="getShutdownPlantsRequest"/>
+		<bpel:variable messageType="energy:shutdownPlantsRequest" name="shutdownPlantsRequest"/>
+
+		<bpel:variable messageType="bsa:emptyResponse" name="emptyResponse"/>
+
+		<bpel:variable messageType="client:prepareRequest" name="prepareRequest"/>
+
+		<bpel:variable name="myName" type="xsd:string"/>
+		<bpel:variable name="BsaProviderName" type="xsd:string"/>
+		<bpel:variable name="BsaProviderAddress" type="xsd:string"/>
+		<bpel:variable name="BsaConsumerName" type="xsd:string"/>
+		<bpel:variable name="BsaConsumerAddress" type="xsd:string"/>
+		<bpel:variable name="BuildingAutomationName" type="xsd:string"/>
+		<bpel:variable name="BuildingAutomationAddress" type="xsd:string"/>
+		<bpel:variable name="EnergyName" type="xsd:string"/>
+		<bpel:variable name="EnergyAddress" type="xsd:string"/>
+    </bpel:variables>
+
+	<bpel:correlationSets>
+		<bpel:correlationSet
+			name="CorrelationSetInstanceID" properties="properties:instanceID" />
+	</bpel:correlationSets>
+
+    <bpel:sequence name="MainSequence">
+
+		<bpel:receive createInstance="yes" operation="Prepare"
+    		partnerLink="BsaClient" portType="client:cdBsaPT"
+    		variable="prepareRequest">
+    		<bpel:correlations>
+				<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+			</bpel:correlations>
+   		</bpel:receive>
+
+		<!-- Instancing name and address variables -->
+		<!-- Client -->
+		<bpel:assign name="assign_myName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>cdBsa</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="myName"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Bsa Provider -->
+        <bpel:assign name="assign_BsaProviderName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>BsaProvider</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="BsaProviderName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_BsaProviderAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="BsaProvider"/>
+            <bpel:to variable="BsaProviderAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_BsaProviderAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $BsaProviderName, $BsaProviderAddress)]]></bpel:from>
+            <bpel:to partnerLink="BsaProvider"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Bsa Consumer -->
+        <bpel:assign name="assign_BsaConsumerName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>BsaConsumer</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="BsaConsumerName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_BsaConsumerAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="BsaConsumer"/>
+            <bpel:to variable="BsaConsumerAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_BsaConsumerAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $BsaConsumerName, $BsaConsumerAddress)]]></bpel:from>
+            <bpel:to partnerLink="BsaConsumer"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- BuildingAutomation -->
+        <bpel:assign name="assign_BuildingAutomationName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>BuildingAutomation</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="BuildingAutomationName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_BuildingAutomationAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="BuildingAutomation"/>
+            <bpel:to variable="BuildingAutomationAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_BuildingAutomationAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $BuildingAutomationName, $BuildingAutomationAddress)]]></bpel:from>
+            <bpel:to partnerLink="BuildingAutomation"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<!-- Energy -->
+        <bpel:assign name="assign_EnergynName" validate="no">
+          <bpel:copy>
+            <bpel:from>
+              <bpel:literal>Energy</bpel:literal>
+            </bpel:from>
+            <bpel:to variable="EnergyName"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="assign_default_EnergyAddress" validate="no">
+          <bpel:copy>
+            <bpel:from endpointReference="partnerRole" partnerLink="Energy"/>
+            <bpel:to variable="EnergyAddress"/>
+          </bpel:copy>
+        </bpel:assign>
+        <bpel:assign name="get_EnergyAddress" validate="no">
+          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $EnergyName, $EnergyAddress)]]></bpel:from>
+            <bpel:to partnerLink="Energy"/>
+          </bpel:copy>
+        </bpel:assign>
+
+		<bpel:flow>
+			<bpel:sequence>
+
+				<!-- Receive from notifyAlarming -> invoke bsa provider -> invoke bsa consumer part -->
+				<bpel:receive createInstance="no" operation="NotifyAlarming"
+		    		partnerLink="BsaClient" portType="client:cdBsaPT"
+		    		variable="notifyAlarmingRequest">
+		    		<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+		   		</bpel:receive>
+		 		<bpel:assign name="assign_forwardSignalEventRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="notifyAlarmingRequest" part="request" />
+						<bpel:to variable="forwardNotifyAlarmingRequest" part="message" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="forwardNotifyAlarmingRequest"
+					name="invoke_notifyAlarming"
+					operation="NotifyAlarming"
+					partnerLink="BsaProvider"/>
+		
+				<bpel:invoke
+					inputVariable="forwardNotifyAlarmingRequest"
+					name="invoke_store_notifyAlarming"
+					operation="storeNotifyAlarmingRequest"
+					partnerLink="BsaConsumer"
+					outputVariable="emptyResponse"/>
+
+				<!-- Invoke signal stop elevators to buildingautomation:
+						1) get from sae consumer part
+						2) invoke service -->
+				<bpel:assign name="assign_getSignalStopElevatorsMessageInput" validate="no">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<tns:getSignalStopElevatorsMessageInput
+										xmlns:tns="http://it.univaq.incipict.ems/sae"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+										<instanceId>InstanceID</instanceId>
+								</tns:getSignalStopElevatorsMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getSignalStopElevatorsMessageInput" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="notifyAlarmingRequest" part="request"/>
+						<bpel:to variable="getSignalStopElevatorsMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="getSignalStopElevatorsMessageInput"
+					name="invoke_getSignalStopElevatorsMessage"
+					operation="getSignalStopElevatorsMessage"
+					partnerLink="BsaConsumer"
+					outputVariable="getSignalStopElevatorsRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_signalStopElevatorsRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="getSignalStopElevatorsRequest" part="response"/>
+						<bpel:to variable="signalStopElevatorsRequest" part="request" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="signalStopElevatorsRequest"
+					name="invoke_SignalStopElevators"
+					operation="SignalStopElevators"
+					partnerLink="BuildingAutomation"/>
+
+			</bpel:sequence>
+
+			<bpel:sequence>
+
+				<!-- Receive from securebuildings -> invoke bsa provider -> invoke bsa consumer part -->
+				<bpel:receive createInstance="no" operation="SecureBuildings"
+		    		partnerLink="BsaClient" portType="client:cdBsaPT"
+		    		variable="secureBuildingsRequest">
+		    		<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+					</bpel:correlations>
+	    		</bpel:receive>
+
+		 		<bpel:assign name="assign_forwardSecureBuildingsRequest" validate="no">
+					<bpel:copy>
+						<bpel:from variable="secureBuildingsRequest" part="request" />
+						<bpel:to variable="forwardSecureBuildingsRequest" part="message" />
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="forwardSecureBuildingsRequest"
+					name="invoke_secureBuildings"
+					operation="SecureBuildings"
+					partnerLink="BsaProvider"/>
+		
+				<bpel:invoke
+					inputVariable="forwardSecureBuildingsRequest"
+					name="invoke_store_secureBuildings"
+					operation="storeSecureBuildingsRequest"
+					partnerLink="BsaConsumer"
+					outputVariable="emptyResponse"/>
+
+				<!-- Invoke signal stop elevators to buildingautomation:
+						1) get from sae consumer part
+						2) invoke service -->
+				<bpel:assign name="assign_getShutdownPlantsMessageInput" validate="no">
+					<bpel:copy>
+						<bpel:from>
+							<bpel:literal>
+								<tns:getShutdownPlantsMessageInput
+										xmlns:tns="http://it.univaq.incipict.ems/sae"
+										xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+										<instanceId>InstanceID</instanceId>
+								</tns:getShutdownPlantsMessageInput>
+							</bpel:literal>
+						</bpel:from>
+						<bpel:to variable="getShutdownPlantsMessageInput" part="request"/>
+					</bpel:copy>
+					<bpel:copy>
+						<bpel:from property="properties:instanceID" variable="secureBuildingsRequest" part="request"/>
+						<bpel:to variable="getShutdownPlantsMessageInput" part="request">
+							<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+								<![CDATA[instanceId]]>
+							</bpel:query>
+						</bpel:to>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="getShutdownPlantsMessageInput"
+					name="invoke_getShutdownPlantsMessage"
+					operation="getShutdownPlantsMessage"
+					partnerLink="BsaConsumer"
+					outputVariable="getShutdownPlantsRequest">
+					<bpel:correlations>
+						<bpel:correlation initiate="join" set="CorrelationSetInstanceID" pattern="request"/>
+					</bpel:correlations>
+				</bpel:invoke>
+
+				<bpel:assign name="assign_shutdownPlantsMessage" validate="no">
+					<bpel:copy>
+						<bpel:from variable="getShutdownPlantsRequest" part="response"/>
+						<bpel:to variable="shutdownPlantsRequest" part="request"/>
+					</bpel:copy>
+				</bpel:assign>
+
+				<bpel:invoke
+					inputVariable="shutdownPlantsRequest"
+					name="invoke_ShutdownPlants"
+					operation="ShutdownPlants"
+					partnerLink="Energy"/>
+
+			</bpel:sequence>
+
+		</bpel:flow>
+		<bpel:exit/>
+    </bpel:sequence>
+</bpel:process>

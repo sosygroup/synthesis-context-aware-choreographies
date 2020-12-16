@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+	name="propertiesAliases"
+	targetNamespace="http://it.univaq.incipict.ems/propertiesAliases"
+	xmlns:vprop="http://docs.oasis-open.org/wsbpel/2.0/varprop"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:properties="http://it.univaq.incipict.ems/properties"
+	xmlns:cdshm="http://it.univaq.incipict.ems/cdShm"
+	xmlns:cddrone="http://it.univaq.incipict.ems/cdDrone">
+
+  <import location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+  <import location="cdDrone.wsdl" namespace="http://it.univaq.incipict.ems/cdDrone"/>
+
+  <vprop:propertyAlias messageType="cddrone:livePhotogrammetryRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>flightId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cddrone:checkpointDescriptionRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>flightId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:livePhotogrammetryRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>flightId</vprop:query>
+  </vprop:propertyAlias>
+
+  <vprop:propertyAlias messageType="cdshm:checkpointDescriptionRequest" part="request" propertyName="properties:instanceID">
+    <vprop:query>flightId</vprop:query>
+  </vprop:propertyAlias>
+
+</definitions>

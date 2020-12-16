@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy xmlns="http://www.apache.org/ode/schemas/dd/2007/03" xmlns:cdEp="http://it.univaq.incipict.ems/cdEp" xmlns:cdShm="http://it.univaq.incipict.ems/cdShm" xmlns:contextevaluator="http://it.univaq.incipict.ems/contextevaluator" xmlns:eCD="http://it.univaq.incipict.ems/eCD/" xmlns:eCD_1="http://it.univaq.incipict.ems/eCD" xmlns:it.univaq.inicipict.mid1.sia="http://it.univaq.inicipict.mid1.sia/">
+  <process name="eCD:eCDProcess.bpel">
+    <active>true</active>
+    <retired>false</retired>
+    <process-events generate="all"/>
+    <provide partnerLink="Client">
+      <service name="eCD_1:eCDService" port="eCDPort"/>
+    </provide>
+    <invoke partnerLink="cdShm">
+      <service name="cdShm:cdShmService" port="cdShmPort"/>
+    </invoke>
+    <invoke partnerLink="cdEp">
+      <service name="cdEp:cdEpService" port="cdEpPort"/>
+    </invoke>
+    <invoke partnerLink="ContextEvaluator">
+      <service name="contextevaluator:roasService" port="ContextEvaluatorPort"/>
+    </invoke>
+  </process>
+  <process name="it.univaq.inicipict.mid1.sia:InvocationAddressService">
+    <process-events generate="all"/>
+    <provide partnerLink="SIAService">
+      <service name="it.univaq.inicipict.mid1.sia:eCDSetInvocationAddressService" port="SetInvocationAddressServicePort"/>
+    </provide>
+  </process>
+</deploy>

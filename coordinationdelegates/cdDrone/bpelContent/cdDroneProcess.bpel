@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpel:process exitOnStandardFault="yes" name="cdDroneProcess.bpel"
+    targetNamespace="http://it.univaq.incipict.ems/cdDrone/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+    xmlns:ns="http://it.univaq.incipict.ems/cdDrone/Artifacts"
+    xmlns:client="http://it.univaq.incipict.ems/cdDrone"
+    xmlns:shm="http://it.univaq.incipict.ems/cdShm"
+    xmlns:properties="http://it.univaq.incipict.ems/properties">
+
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdDroneArtifacts.wsdl" namespace="http://it.univaq.incipict.ems/cdDrone/Artifacts"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdDrone.wsdl" namespace="http://it.univaq.incipict.ems/cdDrone"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="cdShm.wsdl" namespace="http://it.univaq.incipict.ems/cdShm"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="propertiesAliases.wsdl" namespace="http://it.univaq.incipict.ems/propertiesAliases"/>
+    <bpel:import importType="http://schemas.xmlsoap.org/wsdl/" location="properties.wsdl" namespace="http://it.univaq.incipict.ems/properties"/>
+
+    <bpel:partnerLinks>
+        <bpel:partnerLink name="Client" myRole="Client" partnerLinkType="ns:ClientPLT"/>
+        <bpel:partnerLink name="Shm" partnerRole="Shm" partnerLinkType="ns:ShmPLT"/>
+    </bpel:partnerLinks>
+
+    <bpel:variables>
+        <bpel:variable messageType="client:checkpointDescriptionRequest" name="checkpointDescriptionRequest"/>
+        <bpel:variable messageType="shm:checkpointDescriptionRequest" name="forwardCheckpointDescriptionRequest"/>
+
+		<bpel:variable messageType="client:livePhotogrammetryRequest" name="livePhotogrammetryRequest"/>
+        <bpel:variable messageType="shm:livePhotogrammetryRequest" name="forwardLivePhotogrammetryRequest"/>
+
+		<bpel:variable name="continue" type="xsd:boolean"/>
+
+		<bpel:variable name="myName" type="xsd:string"/>
+		<bpel:variable name="cdShmName" type="xsd:string"/>
+		<bpel:variable name="cdShmAddress" type="xsd:string"/>
+    </bpel:variables>
+
+	<bpel:correlationSets>
+		<bpel:correlationSet
+			name="CorrelationSetInstanceID" properties="properties:instanceID" />
+	</bpel:correlationSets>
+
+    <bpel:sequence name="MainSequence">
+
+		<bpel:pick createInstance="yes" name="SwitchInvokedOperation">
+
+			<bpel:onMessage partnerLink="Client"
+	            portType="client:cdDronePT"
+	            operation="SendLivePhotogrammetry" variable="livePhotogrammetryRequest">
+
+	            <bpel:correlations>
+					<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+				</bpel:correlations>
+
+				<bpel:sequence>
+
+					<!-- Instancing name and address variables -->
+					<!-- Client -->
+					<bpel:assign name="assign_myName" validate="no">
+			          <bpel:copy>
+			            <bpel:from>
+			              <bpel:literal>cdDrone</bpel:literal>
+			            </bpel:from>
+			            <bpel:to variable="myName"/>
+			          </bpel:copy>
+			        </bpel:assign>
+			
+					<!-- cdShm -->
+			        <bpel:assign name="assign_cdShmName" validate="no">
+			          <bpel:copy>
+			            <bpel:from>
+			              <bpel:literal>cdShm</bpel:literal>
+			            </bpel:from>
+			            <bpel:to variable="cdShmName"/>
+			          </bpel:copy>
+			        </bpel:assign>
+			        <bpel:assign name="assign_default_cdShmAddress" validate="no">
+			          <bpel:copy>
+			            <bpel:from endpointReference="partnerRole" partnerLink="Shm"/>
+			            <bpel:to variable="cdShmAddress"/>
+			          </bpel:copy>
+			        </bpel:assign>
+			        <bpel:assign name="get_cdShmAddress" validate="no">
+			          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+			            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdShmName, $cdShmAddress)]]></bpel:from>
+			            <bpel:to partnerLink="Shm"/>
+			          </bpel:copy>
+			        </bpel:assign>
+			        <!-- \Instancing name and address variables -->
+
+                    <bpel:assign name="assign_forwardLivePhotogrammetryRequest" validate="no">
+						<bpel:copy>
+							<bpel:from variable="livePhotogrammetryRequest" part="request" />
+							<bpel:to variable="forwardLivePhotogrammetryRequest" part="request" />
+						</bpel:copy>
+					</bpel:assign>
+
+					<bpel:assign name="init_continue" validate="no">
+						<bpel:copy>
+							<bpel:from variable="livePhotogrammetryRequest" part="request">
+								<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+									<![CDATA[continue]]>
+								</bpel:query>
+							</bpel:from>
+							<bpel:to variable="continue"></bpel:to>
+						</bpel:copy>
+					</bpel:assign>
+
+					<bpel:invoke
+						inputVariable="forwardLivePhotogrammetryRequest"
+						name="invoke_sendLivePhotogrammetry"
+						operation="SendLivePhotogrammetry"
+						partnerLink="Shm"/>
+
+                    <bpel:while name="repeat_sendLivePhotogrammetry">
+                    	<bpel:condition><![CDATA[$continue]]></bpel:condition>
+
+						<bpel:sequence>
+							<bpel:receive
+					        	partnerLink="Client"
+					            portType="client:cdDronePT"
+					            operation="SendLivePhotogrammetry" variable="livePhotogrammetryRequest">
+				
+					            <bpel:correlations>
+									<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+								</bpel:correlations>
+					   		</bpel:receive>
+					    		
+					 		<bpel:assign name="assign_forwardLivePhotogrammetryRequest" validate="no">
+								<bpel:copy>
+									<bpel:from variable="livePhotogrammetryRequest" part="request" />
+									<bpel:to variable="forwardLivePhotogrammetryRequest" part="request" />
+								</bpel:copy>
+							</bpel:assign>
+		
+							<bpel:assign name="update_continue" validate="no">
+								<bpel:copy>
+									<bpel:from variable="livePhotogrammetryRequest" part="request">
+										<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+											<![CDATA[continue]]>
+										</bpel:query>
+									</bpel:from>
+									<bpel:to variable="continue"></bpel:to>
+								</bpel:copy>
+							</bpel:assign>
+		
+							<bpel:invoke
+								inputVariable="forwardLivePhotogrammetryRequest"
+								name="invoke_sendLivePhotogrammetry"
+								operation="SendLivePhotogrammetry"
+								partnerLink="Shm"/>
+						</bpel:sequence>
+                    </bpel:while>
+                </bpel:sequence>
+
+            </bpel:onMessage>
+
+	        <bpel:onMessage partnerLink="Client"
+	            portType="client:cdDronePT"
+	            operation="SendCheckpointDescription" variable="checkpointDescriptionRequest">
+
+	            <bpel:correlations>
+					<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+				</bpel:correlations>
+
+				<bpel:sequence>
+
+					<!-- Instancing name and address variables -->
+					<!-- Client -->
+					<bpel:assign name="assign_myName" validate="no">
+			          <bpel:copy>
+			            <bpel:from>
+			              <bpel:literal>cdDrone</bpel:literal>
+			            </bpel:from>
+			            <bpel:to variable="myName"/>
+			          </bpel:copy>
+			        </bpel:assign>
+			
+					<!-- cdShm -->
+			        <bpel:assign name="assign_cdShmName" validate="no">
+			          <bpel:copy>
+			            <bpel:from>
+			              <bpel:literal>cdShm</bpel:literal>
+			            </bpel:from>
+			            <bpel:to variable="cdShmName"/>
+			          </bpel:copy>
+			        </bpel:assign>
+			        <bpel:assign name="assign_default_cdShmAddress" validate="no">
+			          <bpel:copy>
+			            <bpel:from endpointReference="partnerRole" partnerLink="Shm"/>
+			            <bpel:to variable="cdShmAddress"/>
+			          </bpel:copy>
+			        </bpel:assign>
+			        <bpel:assign name="get_cdShmAddress" validate="no">
+			          <bpel:copy xmlns:siaendpointsmanager="java:it.univaq.incipict.mid1.sia.endpoints.manager.services.SiaEndpointsManagerService">
+			            <bpel:from expressionLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath2.0"><![CDATA[siaendpointsmanager:getParticipantAddress($myName, $cdShmName, $cdShmAddress)]]></bpel:from>
+			            <bpel:to partnerLink="Shm"/>
+			          </bpel:copy>
+			        </bpel:assign>
+			        <!-- \Instancing name and address variables -->
+
+					<bpel:assign name="assign_forwardCheckpointDescriptionRequest" validate="no">
+						<bpel:copy>
+							<bpel:from variable="checkpointDescriptionRequest" part="request" />
+							<bpel:to variable="forwardCheckpointDescriptionRequest" part="request" />
+						</bpel:copy>
+					</bpel:assign>
+	
+					<bpel:assign name="init_continue" validate="no">
+						<bpel:copy>
+							<bpel:from variable="checkpointDescriptionRequest" part="request">
+								<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+									<![CDATA[continue]]>
+								</bpel:query>
+							</bpel:from>
+							<bpel:to variable="continue"></bpel:to>
+						</bpel:copy>
+					</bpel:assign>
+	
+					<bpel:invoke
+						inputVariable="forwardCheckpointDescriptionRequest"
+						name="invoke_sendCheckpointDescription"
+						operation="SendCheckpointDescription"
+						partnerLink="Shm"/>
+
+					<bpel:while name="repeat_sendCheckpointDescription">
+                    	<bpel:condition><![CDATA[$continue]]></bpel:condition>
+
+						<bpel:sequence>
+							<bpel:receive partnerLink="Client"
+					            portType="client:cdDronePT"
+					            operation="SendCheckpointDescription" variable="checkpointDescriptionRequest">
+				
+					            <bpel:correlations>
+									<bpel:correlation initiate="join" set="CorrelationSetInstanceID" />
+								</bpel:correlations>
+					   		</bpel:receive>
+					    		
+					 		<bpel:assign name="assign_forwardCheckpointDescriptionRequest" validate="no">
+								<bpel:copy>
+									<bpel:from variable="checkpointDescriptionRequest" part="request" />
+									<bpel:to variable="forwardCheckpointDescriptionRequest" part="request" />
+								</bpel:copy>
+							</bpel:assign>
+			
+							<bpel:assign name="update_continue" validate="no">
+								<bpel:copy>
+									<bpel:from variable="checkpointDescriptionRequest" part="request">
+										<bpel:query queryLanguage="urn:oasis:names:tc:wsbpel:2.0:sublang:xpath1.0">
+											<![CDATA[continue]]>
+										</bpel:query>
+									</bpel:from>
+									<bpel:to variable="continue"></bpel:to>
+								</bpel:copy>
+							</bpel:assign>
+			
+							<bpel:invoke
+								inputVariable="forwardCheckpointDescriptionRequest"
+								name="invoke_sendCheckpointDescription"
+								operation="SendCheckpointDescription"
+								partnerLink="Shm"/>
+						</bpel:sequence>
+                    </bpel:while>
+
+				</bpel:sequence>
+
+            </bpel:onMessage>
+	            
+		</bpel:pick>
+		<bpel:exit/>
+    </bpel:sequence>
+</bpel:process>

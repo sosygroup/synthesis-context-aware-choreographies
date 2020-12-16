@@ -1,0 +1,15 @@
+AQ01	0001	42.352504, 13.399608	Chiesa di Santa Maria di Paganica
+AQ01	0002	42.351203, 13.398212	Palazzo Margherita
+AQ01	0003	42.349165, 13.397176	Duomo
+AQ01	0004	42.348680, 13.397431	Palazzo delle Poste
+AQ01	0005	42.348548, 13.397840	Chiesa di Santa Maria del Suffragio
+AQ01	0006	42.349120, 13.399304	Palazzo Cipolloni Cannella
+AQ01	0007	42.349479, 13.399445	Palazzo Cappa Cappelli
+AQ01	0008	42.350289, 13.402258	Basilica di San Bernardino
+AQ01	0009	42.351388, 13.397193	Palazzo Camponeschi
+AQ01	0010	42.350763, 13.400066	Palazzo Fibbioni
+AQ01	0011	42.352977, 13.401160	Palazzo Lucentini Bonanni
+AQ01	0012	42.352107, 13.401814	Chiesa di Santa Maria del Carmine
+AQ01	0013	42.355641, 13.399919	Università degli Studi, DSU
+AQ01	0014	42.353756, 13.405073	Forte Spagnolo
+AQ01	0015	42.342807, 13.404320	Basilica di Santa Maria di Collemaggio
