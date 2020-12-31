@@ -41,15 +41,12 @@
                <h4 class="section__title">Requirements</h4>
                <p>Java 8 or later and Maven 3.</p>
                <h4 class="section__title">Installation</h4>
-               <p>Clone the replication package from <a target="_blank" href="https://github.com/sosygroup/synthesis-context-aware-choreographies" class="link link--light">Github</a> and build provider and prosumer services.</p>
+               <p>Clone the replication package from <a target="_blank" href="https://github.com/sosygroup/synthesis-context-aware-choreographies" class="link link--light">Github</a> and build everything.</p>
                <div class="code__block code__block--notabs">
                   <pre class="code code--block">
                      <code>
                        git clone https://github.com/sosygroup/synthesis-context-aware-choreographies.git synthesis-context-aware-choreographies
                        cd synthesis-context-aware-choreographies
-                       cd providers
-                       mvn clean install
-                       cd ../prosumers
                        mvn clean install
                      </code>
                   </pre>
@@ -61,14 +58,83 @@
                <h3 class="section__title">Deployment and Enactment</h3>
  
                <h4>Setup your target nodes</h4>
+               <p>Install on your (virtual) machine(s) one or more servlet containers (e.g., Apache Tomcat). Be sure that each servlet container is accessibile from the network.</p>
 
-               <p>Deploy the war files of the provider and prosumer services on one or more servlet containers (e.g., Apache Tomcat). Be sure that each servlet container is accessibile from the network.</p>
+               <h4>Deploy provider and prosumer services</h4>
+               <p>The folder <span class="code code--inline">participant-services</span> contains the set of business services and clients.</p>
+               <table>
+                  <tbody><tr>
+                     <th>Folder</th>
+                     <th>Description</th>
+                  </tr>
+                  <tr>
+                     <td>consumers</td>
+                     <td>Contains the Early Warning System and Drone artifacts. They are the two consumer participants of the choreography.</td>
+                  </tr>
+                  <tr>
+                     <td>prosumers</td>
+                     <td>Contains the artifacts of the prosumer participants of the choreography. After running <span class="code code--inline">mvn install</span> from the root of the repository, a war folder containing all the compiled services is created. Deploy these services where you want.</td>
+                  </tr>
+                  <tr>
+                     <td>providers</td>
+                     <td>Contains the artifacts of the provider participants of the choreography. After running <span class="code code--inline">mvn install</span> from the root of the repository, a war folder containing all the compiled services is created. Deploy these services where you want.</td>
+                  </tr>
+               </tbody></table>
+
+               <h4>Deploy Context Evaluator</h4>
+               <p>The folder <span class="code code--inline">contextevaluator</span> contains the Context Evaluator service. After running <span class="code code--inline">mvn install</span> from the root of the repository, a war file is created into the folder. Deploy the service where you want.</p>
+
+               <h4>Deploy Coordination Delegates</h4>
+               <p>The folder <span class="code code--inline">coordinationdelegates</span> contains the CDs and the eCD. Deploy the CDs and the eCD on an orchestrator engine for WS-BPEL like <a target="_blank" href="http://ode.apache.org" class="link link--light">Apache Ode</a>.</p>
+               <p>After that your orchestrator engine has been deployment, make sure to add the <span class="code code--inline">sia-endpoints-manager.jar</span> file, contained in the <span class="code code--inline">sia-endpoints-manager</span> folder, in the library of the orchestrator engine. If you are using Apache Ode, simply copy it into <span class="code code--inline">WEB-INF/lib/</span> folder of your Apache Ode webapp deploymeny directory.</p>
 
                <hr />
             </section>
             <section id="execution_monitoring">
                <h3 class="section__title">Execution and Monitoring</h3>
 
+               <h4>Set Invocation Address</h4>
+               <p>In order to le the system know the deployment location of each service, it is needed to configure and run the application located in <span class="code code--inline">sia-endpoints-client</span> folder.</p>
+               <p>After having deployed the providers, prosumers, Context Evaluator, CDs, and eCD, edit the <span class="code code--inline">endpoints.properties</span> file contained into <span class="code code--inline">sia-endpoints-client/src/resource</span> directory. It is sufficient to change the host address and the port of the servlet container of each service.</p>
+               <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn exec:java</span> to run.</p>
+               <p>A default deployment schema is provided if you want to avoid to perform this step:</p>
+               <table>
+                  <tbody><tr>
+                     <th>Service</th>
+                     <th>Default host:port</th>
+                  </tr>
+                  <tr>
+                     <td>All prosumer and provider services</td>
+                     <td>localhost:9080</td>
+                  </tr>
+                  <tr>
+                     <td>CDs and eCD</td>
+                     <td>localhost:8080</td>
+                  </tr>
+                  <tr>
+                     <td>Context Evaluator</td>
+                     <td>localhost:9080</td>
+                  </tr>
+               </tbody></table>
+
+               <h4>Run the Choreography</h4>
+               <p>The participant that starts a new choreography instance is <span class="code code--inline">earlywarningsystem</span>.</p>
+               <p>Before running the application, edit the file <span class="code code--inline">application.properties</span> contained into <span class="code code--inline">participant-services/consumers/earlywaringsystem/src/resource</span>, by setting the location of the deployed CDs, if needed. You can also set the simulated earthquake duration and the number of instances to run sequentially.</p>
+               <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn exec:java</span> to run the choreography.</p>
+
+               <h4>Simulate Drones</h4>
+               <p>If simulated context conditions enable variants <i>V1</i> or <i>V2</i>, you can use <span class="code code--inline">drone</span> application to simulate the interaction of the choreography with drones after that the choreography instance has been started.</p>
+               <p>Before running the application, edit the file <span class="code code--inline">endpoints.properties</span> contained into <span class="code code--inline">participant-services/consumers/drone/src/resource</span>, by setting the location of the <span class="code code--inline">dronefleetcontroller</span> service and of <span class="code code--inline">cdDrone</span>, if needed.</p>
+               <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn exec:java</span> to start the simulation.</p>
+
+               <h4>View the Civl Protection dashboard</h4>
+               <p>According to the deployment address of the service <span class="code code--inline">civilprotection</span>, the dashboard is available at <span class="code code--inline">http://[host]:[port]/civilprotection/docs/dashboard.html</span>. The default host and port are <span class="code code--inline">localhost:9080</span>.</p>
+
+               <h4>View the Monitor</h4>
+               <p>The folder <span class="code code--inline">monitor</span> contains the monitor service that allows to check the timeline of all the choreography instances that have been executed.</p>
+               <p>Before running the application, edit the file <span class="code code--inline">application.properties</span> contained into <span class="code code--inline">monitor/src/main/resources</span>, by setting the <span class="code code--inline">monitor.port</span> property for the port of the monitor service, and the <span class="code code--inline">monitor.services.baseUrl</span> properties for the host and port of provider and prosumer services.</p>
+               <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn exec:java</span> to run the monitor service.</p>
+               <p>According to the selected port, the service is available at <span class="code code--inline">http://localhost:[port]/monitor/</span>.</p>
             </section>
          </article>
       </div>
