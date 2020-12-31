@@ -39,37 +39,9 @@ public class SiaEndpointsManagerService {
 		String participantAddressRetrieved = SetInvocationAddressUtils.getParticipantArtifactEndpointAddress(callingParticipantName, searchingParticipantName);
 
 		if (participantAddressRetrieved != null) {
-//			if (!callingParticipantName.equals(searchingParticipantName)) {
-//				//CD to CD
-//				if (participantAddressRetrieved.contains("/ode")) {
-//					String participantAddress_part1 = participantAddressRetrieved.substring(0, participantAddressRetrieved.lastIndexOf('/'));
-//					String participantAddress_part2 = defaultWSDLAddress.substring(defaultWSDLAddress.lastIndexOf('/'));
-//					return participantAddress_part1 + participantAddress_part2;	
-//				} else { //CD to provider e.g., personalweatherstations
-//					String participantAddress_part1 = participantAddressRetrieved.substring(0, participantAddressRetrieved.lastIndexOf('/'));
-//					String participantAddress_part2 = getPathUrl(defaultWSDLAddress);
-//					return participantAddress_part1 + participantAddress_part2;
-//				}
-//			} else { //CD to prosumer
-//				String participantFromNameWithoutSpace = callingParticipantName.replace(" ", "").toLowerCase();
-//				String participantAddress_part1 = participantAddressRetrieved.substring(0, participantAddressRetrieved.lastIndexOf('/'));
-//				//String participantAddress_part2 = participantToAddress.substring(participantToAddress.toLowerCase().indexOf(participantFromNameWithoutSpace));
-//				String participantAddress_part2 = getPathUrl(defaultWSDLAddress);
-//				return participantAddress_part1 + participantAddress_part2;
-//			}
 			return participantAddressRetrieved;
 		} else {
 			return defaultWSDLAddress;
 		}
 	}	
-
-//	private static String getPathUrl(String participantToAddress) {
-//		try {
-//			URI uri = URI.create(participantToAddress);
-//			return uri.getPath();
-//		} catch (Exception e) {
-//			return "";
-//		}
-//	}
-			
 }

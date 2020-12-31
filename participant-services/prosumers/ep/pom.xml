@@ -3,17 +3,18 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>it.univaq.incipict.ems</groupId>
-  <artifactId>contextevaluator</artifactId>
+  <artifactId>ep</artifactId>
   <version>1.0.0</version>
   <packaging>war</packaging>
 
-  <name>contextevaluator</name>
+  <name>ep</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cxf.version>3.3.3</cxf.version>
     <cxf-xjc.version>3.3.0</cxf-xjc.version>
     <spring.version>5.2.1.RELEASE</spring.version>
+    <jackson.version>2.10.1</jackson.version>
     <slf4j.version>1.7.29</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
   </properties>
@@ -24,6 +25,18 @@
 		<groupId>org.apache.cxf</groupId>
 		<artifactId>cxf-rt-frontend-jaxws</artifactId>
 		<version>${cxf.version}</version>
+	</dependency>
+
+  	<dependency>
+		<groupId>org.apache.cxf</groupId>
+		<artifactId>cxf-rt-frontend-jaxrs</artifactId>
+		<version>${cxf.version}</version>
+	</dependency>
+
+	<dependency>
+	    <groupId>com.fasterxml.jackson.jaxrs</groupId>
+	    <artifactId>jackson-jaxrs-json-provider</artifactId>
+	    <version>${jackson.version}</version>
 	</dependency>
 
 	<dependency>
@@ -51,6 +64,12 @@
 	</dependency>
 
 	<dependency>
+	    <groupId>com.fasterxml.jackson.core</groupId>
+	    <artifactId>jackson-databind</artifactId>
+	    <version>${jackson.version}</version>
+	</dependency>
+
+	<dependency>
 		<groupId>org.slf4j</groupId>
 		<artifactId>slf4j-api</artifactId>
 		<version>${slf4j.version}</version>
@@ -70,7 +89,7 @@
 
   </dependencies>
 
-	<build>
+<build>
 		<defaultGoal>install</defaultGoal>
 		<resources>
 			<resource>
@@ -99,8 +118,8 @@
 			            <phase>generate-sources</phase>
 			            <configuration>
   			                <wsdlOptions>
-			                    <wsdlOption>
-			                        <wsdl>${project.basedir}/src/main/resources/contextevaluator.wsdl</wsdl>
+							    <wsdlOption>
+			                        <wsdl>${project.basedir}/src/main/resources/ep.wsdl</wsdl>
 			                        <faultSerialVersionUID>1</faultSerialVersionUID>
 							      <bindingFiles>
 							        <bindingFile>${project.basedir}/src/main/resources/binding.xml</bindingFile>
@@ -108,7 +127,7 @@
 							      <extraargs>
 									<extraarg>-verbose</extraarg>
 									<extraarg>-p</extraarg>
-									<extraarg>it.univaq.incipict.ems.contextevaluator</extraarg>
+									<extraarg>it.univaq.incipict.ems.ep</extraarg>
 								  </extraargs>
 							    </wsdlOption>
 			                </wsdlOptions>
@@ -120,6 +139,6 @@
 			    </executions>
 			</plugin>
 		</plugins>
-		<finalName>contextevaluator</finalName>
+		<finalName>ep</finalName>
 	</build>
 </project>

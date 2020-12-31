@@ -1,13 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>it.univaq.incipict.ems</groupId>
-  <artifactId>contextevaluator</artifactId>
+  <artifactId>earlywarningsystem</artifactId>
   <version>1.0.0</version>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
 
-  <name>contextevaluator</name>
+  <name>earlywarningsystem</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -44,10 +43,11 @@
 	    <version>${spring.version}</version>
 	</dependency>
 
+	<!-- Commons Lang for random string generation -->
 	<dependency>
-	    <groupId>org.springframework</groupId>
-	    <artifactId>spring-web</artifactId>
-	    <version>${spring.version}</version>
+	  <groupId>org.apache.commons</groupId>
+	  <artifactId>commons-lang3</artifactId>
+	  <version>3.9</version>
 	</dependency>
 
 	<dependency>
@@ -99,8 +99,8 @@
 			            <phase>generate-sources</phase>
 			            <configuration>
   			                <wsdlOptions>
-			                    <wsdlOption>
-			                        <wsdl>${project.basedir}/src/main/resources/contextevaluator.wsdl</wsdl>
+							    <wsdlOption>
+			                        <wsdl>${project.basedir}/src/main/resources/cdEarlywarningsystem.wsdl</wsdl>
 			                        <faultSerialVersionUID>1</faultSerialVersionUID>
 							      <bindingFiles>
 							        <bindingFile>${project.basedir}/src/main/resources/binding.xml</bindingFile>
@@ -108,7 +108,48 @@
 							      <extraargs>
 									<extraarg>-verbose</extraarg>
 									<extraarg>-p</extraarg>
-									<extraarg>it.univaq.incipict.ems.contextevaluator</extraarg>
+									<extraarg>it.univaq.incipict.ems.earlywarningsystem.providers</extraarg>
+								  </extraargs>
+							    </wsdlOption>
+
+								<wsdlOption>
+			                        <wsdl>${project.basedir}/src/main/resources/cds/cdBsa.wsdl</wsdl>
+			                        <faultSerialVersionUID>1</faultSerialVersionUID>
+							      <extraargs>
+									<extraarg>-p</extraarg>
+									<extraarg>it.univaq.incipict.ems.earlywarningsystem.utils.cds</extraarg>
+								  </extraargs>
+							    </wsdlOption>
+							    <wsdlOption>
+			                        <wsdl>${project.basedir}/src/main/resources/cds/cdEp.wsdl</wsdl>
+			                        <faultSerialVersionUID>1</faultSerialVersionUID>
+							      <extraargs>
+									<extraarg>-p</extraarg>
+									<extraarg>it.univaq.incipict.ems.earlywarningsystem.utils.cds</extraarg>
+								  </extraargs>
+							    </wsdlOption>
+							    <wsdlOption>
+			                        <wsdl>${project.basedir}/src/main/resources/cds/cdSae.wsdl</wsdl>
+			                        <faultSerialVersionUID>1</faultSerialVersionUID>
+							      <extraargs>
+									<extraarg>-p</extraarg>
+									<extraarg>it.univaq.incipict.ems.earlywarningsystem.utils.cds</extraarg>
+								  </extraargs>
+							    </wsdlOption>
+							    <wsdlOption>
+			                        <wsdl>${project.basedir}/src/main/resources/cds/cdShm.wsdl</wsdl>
+			                        <faultSerialVersionUID>1</faultSerialVersionUID>
+							      <extraargs>
+									<extraarg>-p</extraarg>
+									<extraarg>it.univaq.incipict.ems.earlywarningsystem.utils.cds</extraarg>
+								  </extraargs>
+							    </wsdlOption>
+							    <wsdlOption>
+			                        <wsdl>${project.basedir}/src/main/resources/cds/eCD.wsdl</wsdl>
+			                        <faultSerialVersionUID>1</faultSerialVersionUID>
+							      <extraargs>
+									<extraarg>-p</extraarg>
+									<extraarg>it.univaq.incipict.ems.earlywarningsystem.utils.cds</extraarg>
 								  </extraargs>
 							    </wsdlOption>
 			                </wsdlOptions>
@@ -120,6 +161,6 @@
 			    </executions>
 			</plugin>
 		</plugins>
-		<finalName>contextevaluator</finalName>
+		<finalName>earlywarningsystem</finalName>
 	</build>
 </project>

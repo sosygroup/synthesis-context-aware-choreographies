@@ -1,13 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>it.univaq.incipict.ems</groupId>
-  <artifactId>contextevaluator</artifactId>
+  <artifactId>sensornetwork</artifactId>
   <version>1.0.0</version>
   <packaging>war</packaging>
 
-  <name>contextevaluator</name>
+  <name>sensornetwork</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -48,6 +47,13 @@
 	    <groupId>org.springframework</groupId>
 	    <artifactId>spring-web</artifactId>
 	    <version>${spring.version}</version>
+	</dependency>
+
+	<dependency>
+	    <groupId>org.projectlombok</groupId>
+	    <artifactId>lombok</artifactId>
+	    <version>1.18.10</version>
+	    <scope>provided</scope>
 	</dependency>
 
 	<dependency>
@@ -100,7 +106,7 @@
 			            <configuration>
   			                <wsdlOptions>
 			                    <wsdlOption>
-			                        <wsdl>${project.basedir}/src/main/resources/contextevaluator.wsdl</wsdl>
+			                        <wsdl>${project.basedir}/src/main/resources/sensornetwork.wsdl</wsdl>
 			                        <faultSerialVersionUID>1</faultSerialVersionUID>
 							      <bindingFiles>
 							        <bindingFile>${project.basedir}/src/main/resources/binding.xml</bindingFile>
@@ -108,7 +114,7 @@
 							      <extraargs>
 									<extraarg>-verbose</extraarg>
 									<extraarg>-p</extraarg>
-									<extraarg>it.univaq.incipict.ems.contextevaluator</extraarg>
+									<extraarg>it.univaq.incipict.ems.sensornetwork</extraarg>
 								  </extraargs>
 							    </wsdlOption>
 			                </wsdlOptions>
@@ -120,6 +126,6 @@
 			    </executions>
 			</plugin>
 		</plugins>
-		<finalName>contextevaluator</finalName>
+		<finalName>sensornetwork</finalName>
 	</build>
 </project>
