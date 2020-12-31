@@ -160,6 +160,13 @@
 			        </execution>
 			    </executions>
 			</plugin>
+			<plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>it.univaq.incipict.ems.earlywarningsystem.EarlyWarningSystemApp</mainClass>
+                </configuration>
+            </plugin>
 		</plugins>
 		<finalName>earlywarningsystem</finalName>
 	</build>

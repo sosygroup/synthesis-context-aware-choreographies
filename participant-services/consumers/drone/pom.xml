@@ -125,6 +125,13 @@
 			        </execution>
 			    </executions>
 			</plugin>
+			<plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>it.univaq.incipict.ems.drone.DroneApp</mainClass>
+                </configuration>
+            </plugin>
 		</plugins>
 		<finalName>drone</finalName>
 	</build>
