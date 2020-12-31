@@ -95,7 +95,7 @@
 
                <h4>Set Invocation Address</h4>
                <p>In order to le the system know the deployment location of each service, it is needed to configure and run the application located in <span class="code code--inline">sia-endpoints-client</span> folder.</p>
-               <p>After having deployed the providers, prosumers, Context Evaluator, CDs, and eCD, edit the <span class="code code--inline">endpoints.properties</span> file contained into <span class="code code--inline">sia-endpoints-client/src/resource</span> directory. It is sufficient to change the host address and the port of the servlet container of each service.</p>
+               <p>After having deployed the providers, prosumers, Context Evaluator, CDs, and eCD, edit the <span class="code code--inline">endpoints.properties</span> file contained into <span class="code code--inline">sia-endpoints-client/src/main/resources</span> directory. It is sufficient to change the host address and the port of the servlet container of each service.</p>
                <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn exec:java</span> to run.</p>
                <p>A default deployment schema is provided if you want to avoid to perform this step:</p>
                <table>
@@ -119,12 +119,12 @@
 
                <h4>Run the Choreography</h4>
                <p>The participant that starts a new choreography instance is <span class="code code--inline">earlywarningsystem</span>.</p>
-               <p>Before running the application, edit the file <span class="code code--inline">application.properties</span> contained into <span class="code code--inline">participant-services/consumers/earlywaringsystem/src/resource</span>, by setting the location of the deployed CDs, if needed. You can also set the simulated earthquake duration and the number of instances to run sequentially.</p>
+               <p>Before running the application, edit the file <span class="code code--inline">application.properties</span> contained into <span class="code code--inline">participant-services/consumers/earlywaringsystem/src/main/resources</span>, by setting the location of the deployed CDs, if needed. You can also set the simulated earthquake duration and the number of instances to run sequentially.</p>
                <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn exec:java</span> to run the choreography.</p>
 
                <h4>Simulate Drones</h4>
                <p>If simulated context conditions enable variants <i>V1</i> or <i>V2</i>, you can use <span class="code code--inline">drone</span> application to simulate the interaction of the choreography with drones after that the choreography instance has been started.</p>
-               <p>Before running the application, edit the file <span class="code code--inline">endpoints.properties</span> contained into <span class="code code--inline">participant-services/consumers/drone/src/resource</span>, by setting the location of the <span class="code code--inline">dronefleetcontroller</span> service and of <span class="code code--inline">cdDrone</span>, if needed.</p>
+               <p>Before running the application, edit the file <span class="code code--inline">endpoints.properties</span> contained into <span class="code code--inline">participant-services/consumers/drone/src/main/resources</span>, by setting the location of the <span class="code code--inline">dronefleetcontroller</span> service and of <span class="code code--inline">cdDrone</span>, if needed.</p>
                <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn exec:java</span> to start the simulation.</p>
 
                <h4>View the Civl Protection dashboard</h4>
@@ -132,8 +132,8 @@
 
                <h4>View the Monitor</h4>
                <p>The folder <span class="code code--inline">monitor</span> contains the monitor service that allows to check the timeline of all the choreography instances that have been executed.</p>
-               <p>Before running the application, edit the file <span class="code code--inline">application.properties</span> contained into <span class="code code--inline">monitor/src/main/resources</span>, by setting the <span class="code code--inline">monitor.port</span> property for the port of the monitor service, and the <span class="code code--inline">monitor.services.baseUrl</span> properties for the host and port of provider and prosumer services.</p>
-               <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn exec:java</span> to run the monitor service.</p>
+               <p>Before running the application, edit the file <span class="code code--inline">application.properties</span> contained into <span class="code code--inline">monitor/src/main/main/resourcess</span>, by setting the <span class="code code--inline">monitor.port</span> property for the port of the monitor service, and the <span class="code code--inline">monitor.services.baseUrl</span> properties for the host and port of provider and prosumer services.</p>
+               <p>Execute <span class="code code--inline">mvn clean compile</span> to apply changes and then <span class="code code--inline">mvn spring-boot:run</span> to run the monitor service.</p>
                <p>According to the selected port, the service is available at <span class="code code--inline">http://localhost:[port]/monitor/</span>.</p>
             </section>
          </article>
